@@ -1,0 +1,232 @@
+name: "Promote Release and Update Appcast"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to promote (for example: v2026.02.16-main.123.1)"
+        required: true
+        type: string
+      sparkle_tools_version:
+        description: "Sparkle tools version"
+        required: false
+        default: "2.8.0"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: promote-release-${{ github.event.inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Sparkle tools
+        uses: jozefizso/setup-sparkle@v1
+        with:
+          version: ${{ github.event.inputs.sparkle_tools_version }}
+
+      - name: Resolve release metadata
+        id: release_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.payload.inputs.tag
+            if (!tag) {
+              core.setFailed("Missing required workflow input: tag")
+              return
+            }
+            const { owner, repo } = context.repo
+            const release = (await github.rest.repos.getReleaseByTag({ owner, repo, tag })).data
+            const zipAsset = release.assets.find(asset => asset.name.endsWith(".zip"))
+
+            if (!zipAsset) {
+              core.setFailed(`No .zip asset found in release for tag ${tag}`)
+              return
+            }
+
+            if (!release.prerelease) {
+              core.warning(`Release ${tag} is already not marked as pre-release.`)
+            }
+
+            core.setOutput("release_id", String(release.id))
+            core.setOutput("release_html_url", release.html_url)
+            core.setOutput("published_at", release.published_at || new Date().toISOString())
+            core.setOutput("asset_id", String(zipAsset.id))
+            core.setOutput("asset_name", zipAsset.name)
+            core.setOutput("asset_size", String(zipAsset.size))
+
+      - name: Download release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_ID: ${{ steps.release_info.outputs.asset_id }}
+          ASSET_NAME: ${{ steps.release_info.outputs.asset_name }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          curl --fail --location \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/octet-stream" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/assets/${ASSET_ID}" \
+            --output "dist/${ASSET_NAME}"
+
+      - name: Sign asset for Sparkle
+        id: sparkle_signature
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          ASSET_NAME: ${{ steps.release_info.outputs.asset_name }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${SPARKLE_PRIVATE_KEY:-}" ]]; then
+            echo "Missing required secret: SPARKLE_PRIVATE_KEY"
+            exit 1
+          fi
+
+          SIGNATURE="$(echo "${SPARKLE_PRIVATE_KEY}" | sign_update --ed-key-file - -p "dist/${ASSET_NAME}")"
+          if [[ -z "${SIGNATURE}" ]]; then
+            echo "Failed to generate Sparkle signature."
+            exit 1
+          fi
+
+          echo "signature=${SIGNATURE}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract app metadata
+        id: app_meta
+        env:
+          ASSET_NAME: ${{ steps.release_info.outputs.asset_name }}
+        run: |
+          set -euo pipefail
+
+          rm -rf dist/unpacked
+          unzip -q "dist/${ASSET_NAME}" -d dist/unpacked
+
+          APP_PATH="$(find dist/unpacked -maxdepth 2 -name "*.app" -print -quit)"
+          if [[ -z "${APP_PATH}" ]]; then
+            echo "No .app found after unzipping dist/${ASSET_NAME}"
+            exit 1
+          fi
+
+          INFO_PLIST="${APP_PATH}/Contents/Info.plist"
+          SHORT_VERSION="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "${INFO_PLIST}")"
+          BUNDLE_VERSION="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "${INFO_PLIST}")"
+          MIN_SYSTEM_VERSION="$(/usr/libexec/PlistBuddy -c "Print :LSMinimumSystemVersion" "${INFO_PLIST}" 2>/dev/null || echo "13.0")"
+
+          echo "short_version=${SHORT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bundle_version=${BUNDLE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "minimum_system_version=${MIN_SYSTEM_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Update appcast.xml
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+          ASSET_NAME: ${{ steps.release_info.outputs.asset_name }}
+          ASSET_SIZE: ${{ steps.release_info.outputs.asset_size }}
+          RELEASE_HTML_URL: ${{ steps.release_info.outputs.release_html_url }}
+          RELEASE_PUBLISHED_AT: ${{ steps.release_info.outputs.published_at }}
+          SPARKLE_SIGNATURE: ${{ steps.sparkle_signature.outputs.signature }}
+          SHORT_VERSION: ${{ steps.app_meta.outputs.short_version }}
+          BUNDLE_VERSION: ${{ steps.app_meta.outputs.bundle_version }}
+          MIN_SYSTEM_VERSION: ${{ steps.app_meta.outputs.minimum_system_version }}
+        run: |
+          set -euo pipefail
+
+          export ASSET_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${ASSET_NAME}"
+
+          python3 - <<'PY'
+          import os
+          from datetime import datetime, timezone
+          from email.utils import format_datetime
+          import xml.etree.ElementTree as ET
+
+          appcast_path = "appcast.xml"
+          sparkle_ns = "http://www.andymatuschak.org/xml-namespaces/sparkle"
+          ET.register_namespace("sparkle", sparkle_ns)
+
+          tree = ET.parse(appcast_path)
+          root = tree.getroot()
+          channel = root.find("channel")
+          if channel is None:
+              raise RuntimeError("Invalid appcast.xml: missing <channel>")
+
+          published_at = os.environ["RELEASE_PUBLISHED_AT"]
+          try:
+              published_dt = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+          except ValueError:
+              published_dt = datetime.now(timezone.utc)
+          pub_date = format_datetime(published_dt)
+
+          new_item = ET.Element("item")
+          ET.SubElement(new_item, "title").text = os.environ["SHORT_VERSION"]
+          ET.SubElement(new_item, "pubDate").text = pub_date
+          ET.SubElement(new_item, f"{{{sparkle_ns}}}version").text = os.environ["BUNDLE_VERSION"]
+          ET.SubElement(new_item, f"{{{sparkle_ns}}}shortVersionString").text = os.environ["SHORT_VERSION"]
+          ET.SubElement(new_item, f"{{{sparkle_ns}}}releaseNotesLink").text = os.environ["RELEASE_HTML_URL"]
+          ET.SubElement(new_item, f"{{{sparkle_ns}}}minimumSystemVersion").text = os.environ["MIN_SYSTEM_VERSION"]
+
+          enclosure = ET.SubElement(new_item, "enclosure")
+          enclosure.set("url", os.environ["ASSET_URL"])
+          enclosure.set("length", os.environ["ASSET_SIZE"])
+          enclosure.set("type", "application/octet-stream")
+          enclosure.set(f"{{{sparkle_ns}}}edSignature", os.environ["SPARKLE_SIGNATURE"])
+
+          for old_item in list(channel.findall("item")):
+              old_short = old_item.find(f"{{{sparkle_ns}}}shortVersionString")
+              old_enclosure = old_item.find("enclosure")
+              old_url = old_enclosure.get("url") if old_enclosure is not None else ""
+              if (old_short is not None and old_short.text == os.environ["SHORT_VERSION"]) or old_url == os.environ["ASSET_URL"]:
+                  channel.remove(old_item)
+
+          title = channel.find("title")
+          insert_index = list(channel).index(title) + 1 if title is not None else 0
+          channel.insert(insert_index, new_item)
+
+          try:
+              ET.indent(tree, space="    ")
+          except AttributeError:
+              pass
+
+          tree.write(appcast_path, encoding="UTF-8", xml_declaration=True)
+          PY
+        shell: bash
+
+      - name: Commit and push appcast.xml
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- appcast.xml; then
+            echo "No appcast changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add appcast.xml
+          git commit -m "chore: update appcast for ${TAG}"
+          git push origin main
+
+      - name: Mark release as stable
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo
+            const releaseId = Number("${{ steps.release_info.outputs.release_id }}")
+
+            await github.rest.repos.updateRelease({
+              owner,
+              repo,
+              release_id: releaseId,
+              prerelease: false
+            })
