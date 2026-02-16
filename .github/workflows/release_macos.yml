@@ -1,0 +1,88 @@
+name: "Release macOS App"
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-release:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build app
+        env:
+          DERIVED_DATA: ${{ github.workspace }}/build/DerivedData
+        run: |
+          set -euo pipefail
+
+          xcodebuild \
+            -workspace Easydict.xcworkspace \
+            -scheme Easydict \
+            -configuration Release \
+            -destination "platform=macOS" \
+            -derivedDataPath "$DERIVED_DATA" \
+            ENABLE_PREVIEWS=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            build
+
+      - name: Package app
+        id: package
+        env:
+          DERIVED_DATA: ${{ github.workspace }}/build/DerivedData
+        run: |
+          set -euo pipefail
+
+          APP_PATH="$(find "$DERIVED_DATA/Build/Products/Release" -maxdepth 1 -name "*.app" -print -quit)"
+          if [[ -z "$APP_PATH" ]]; then
+            echo "No app bundle found in Release products."
+            exit 1
+          fi
+
+          mkdir -p dist
+
+          APP_NAME="$(basename "$APP_PATH" .app)"
+          ZIP_PATH="dist/${APP_NAME}-${GITHUB_REF_NAME}.zip"
+          SHASUM_PATH="${ZIP_PATH}.sha256"
+
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
+          shasum -a 256 "$ZIP_PATH" > "$SHASUM_PATH"
+
+          echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "zip_path=$ZIP_PATH" >> "$GITHUB_OUTPUT"
+          echo "shasum_path=$SHASUM_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Easydict-${{ github.ref_name }}
+          path: |
+            ${{ steps.package.outputs.zip_path }}
+            ${{ steps.package.outputs.shasum_path }}
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.package.outputs.zip_path }}
+            ${{ steps.package.outputs.shasum_path }}
+          generate_release_notes: true
