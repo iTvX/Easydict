@@ -110,29 +110,3 @@ brew install --cask easydict
 ## Statement
 
 Easydict is licensed under the [GPL-3.0](https://github.com/iTvX/Easydict/blob/main/LICENSE) open source license, which is for learning and communication only. Anyone can get this product and source code for free. If you believe that your legal rights have been violated, please contact the [author](https://github.com/iTvX) immediately. You can use the source code freely, but you must attach the corresponding license and copyright.
-
-## Sponsor
-
-Easydict is a free and open source project, currently mainly developed and maintained by the author. If you like this project and find it helpful, you can consider sponsoring this project to support it, so that it can go further.
-
-Thanks to [@CanglongCl](https://github.com/CanglongCl) for providing the Apple Developer account, which solved the app [signature issue](https://github.com/iTvX/Easydict/issues/2), allowing more people to use Easydict conveniently.
-
-<a href="https://afdian.com/a/tisfeng"><img width="20%" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.jpg" alt=""></a>
-
-<div>
-  <img src="https://raw.githubusercontent.com/tisfeng/ImageBed/main/uPic/IMG_4739-1684680971.JPG" width="30%">
-</div>
-
-Thanks to all sponsors for their generous support. For details, please see the [Sponsor List](./docs/en/SPONSOR_LIST.md).
-
----
-
-## Star History
-
-<a href="https://star-history.com/#iTvX/Easydict&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
-  </picture>
-</a>
