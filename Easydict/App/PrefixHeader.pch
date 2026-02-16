@@ -1,0 +1,24 @@
+//
+//  PrefixHeader.pch
+//  Easydict
+//
+//  Created by tisfeng on 2022/10/30.
+//  Copyright © 2023 izual. All rights reserved.
+//
+
+#import <Masonry/Masonry.h>
+#import <MJExtension.h>
+#import <ReactiveObjC/ReactiveObjC.h>
+#import <AFNetworking/AFNetworking.h>
+
+#import "MMMacro.h"
+#import "MMMake.h"
+#import "NSColor+MyColors.h"
+#import "MMEventMonitor.h"
+
+#import "MMLog.h"
+
+#import "EZConst.h"
+#import "EZConstKey.h"
+
+#import "Easydict-Swift.h"
