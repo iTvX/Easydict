@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/tisfeng/ImageBed/main/uPic/icon_512x512@2x.png" height="256">
   <h1 align="center">Easydict</h1>
-  <h4 align="center"> Easy to look up words or translate text</h4>
+  <h4 align="center">macOS Dictionary & AI Translation App</h4>
 <p align="center"> 
 <a href="https://github.com/tisfeng/easydict/blob/main/LICENSE">
 <img src="https://img.shields.io/github/license/tisfeng/easydict"
@@ -20,7 +20,9 @@
 
 ## Easydict
 
-`Easydict` is a concise and easy-to-use translation dictionary macOS App that allows you to easily and elegantly look up words or translate text.
+`Easydict` is an independent macOS dictionary and AI translation app focused on fast word lookup and multilingual AI-assisted translation.
+
+It is designed for daily productivity on macOS, with input translation, select-to-translate, OCR screenshot translation, and multi-service querying in one app.
 
 Easydict is ready to use out of the box, can automatically recognize the language of the input text, supports input translate, select translate, and OCR screenshot translate, and can query multiple translation services results at the same time.
 

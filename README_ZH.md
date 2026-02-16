@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/tisfeng/ImageBed/main/uPic/icon_512x512@2x.png" height="256">
   <h1 align="center">Easydict</h1>
-  <h4 align="center"> Easy to look up words or translate text</h4>
+  <h4 align="center">基于 macOS 的词典与 AI 翻译软件</h4>
 <p align="center"> 
 <a href="https://github.com/tisfeng/easydict/blob/main/LICENSE">
 <img src="https://img.shields.io/github/license/tisfeng/easydict"
@@ -20,7 +20,9 @@
 
 ## Easydict
 
-`Easydict` 是一个简洁易用的词典翻译 macOS App，能够轻松优雅地查找单词或翻译文本。
+`Easydict` 是一款独立开发的 macOS 词典与 AI 翻译软件，专注于高效查词和多语言智能翻译。
+
+它面向日常生产力场景，集成输入翻译、划词翻译、OCR 截图翻译和多服务聚合查询，持续优化性能、稳定性与使用体验。
 
 Easydict 开箱即用，能自动识别输入文本语言，支持输入翻译、划词翻译和 OCR 截图翻译，可同时查询多个翻译服务结果。
 
