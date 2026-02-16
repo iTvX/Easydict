@@ -3,11 +3,11 @@
   <h1 align="center">Easydict</h1>
   <h4 align="center">基于 macOS 的词典与 AI 翻译软件</h4>
 <p align="center"> 
-<a href="https://github.com/tisfeng/easydict/blob/main/LICENSE">
-<img src="https://img.shields.io/github/license/tisfeng/easydict"
+<a href="https://github.com/iTvX/Easydict/blob/main/LICENSE">
+<img src="https://img.shields.io/github/license/iTvX/Easydict"
             alt="License"></a>
-<a href="https://github.com/tisfeng/Easydict/releases">
-<img src="https://img.shields.io/github/downloads/tisfeng/easydict/total.svg"
+<a href="https://github.com/iTvX/Easydict/releases">
+<img src="https://img.shields.io/github/downloads/iTvX/Easydict/total.svg"
             alt="Downloads"></a>
 <a href="https://img.shields.io/badge/-macOS-black?&logo=apple&logoColor=white">
 <img src="https://img.shields.io/badge/-macOS-black?&logo=apple&logoColor=white"
@@ -47,7 +47,7 @@ Easydict 开箱即用，能自动识别输入文本语言，支持输入翻译�
 - 🌐 支持 20+ 翻译服务（OpenAI、Gemini、DeepL、Google、Ollama、Groq 等）
 - 🗣️ 支持 48 种语言
 
-**如果觉得这个应用还不错，给个 [Star](https://github.com/tisfeng/Easydict) ⭐️ 支持一下吧 (^-^)**
+**如果觉得这个应用还不错，给个 [Star](https://github.com/iTvX/Easydict) ⭐️ 支持一下吧 (^-^)**
 
 ## 贡献
 
@@ -72,10 +72,10 @@ brew install --cask easydict
 
 ### 手动下载安装
 
-[下载](https://github.com/tisfeng/Easydict/releases) 最新版本的 Easydict。
+[下载](https://github.com/iTvX/Easydict/releases) 最新版本的 Easydict。
 
 > [!NOTE]
-> 最新版本支持 macOS 13.0+，如果系统版本为 macOS 11.0+，请使用 [2.7.2](https://github.com/tisfeng/Easydict/releases/tag/2.7.2)
+> 最新版本支持 macOS 13.0+，如果系统版本为 macOS 11.0+，请使用 [2.7.2](https://github.com/iTvX/Easydict/releases/tag/2.7.2)
 
 ---
 
@@ -109,13 +109,13 @@ brew install --cask easydict
 
 ## 声明
 
-Easydict 为 [GPL-3.0](https://github.com/tisfeng/Easydict/blob/main/LICENSE) 开源协议，仅供学习交流，任何人都可以免费获取该产品和源代码。如果你认为您的合法权益受到侵犯，请立即联系[作者](https://github.com/tisfeng)。你可以自由使用源代码，但必须附上相应的许可证和版权声明。
+Easydict 为 [GPL-3.0](https://github.com/iTvX/Easydict/blob/main/LICENSE) 开源协议，仅供学习交流，任何人都可以免费获取该产品和源代码。如果你认为您的合法权益受到侵犯，请立即联系[作者](https://github.com/iTvX)。你可以自由使用源代码，但必须附上相应的许可证和版权声明。
 
 ## 赞助支持
 
 Easydict 作为一个免费开源的非盈利项目，目前主要是作者个人在开发和维护，如果你喜欢这个项目，觉得它对你有帮助，可以考虑赞助支持一下这个项目，用爱发电，让它能够走得更远。
 
-感谢 [@CanglongCl](https://github.com/CanglongCl) 提供的苹果开发者账号，解决了应用 [签名问题](https://github.com/tisfeng/Easydict/issues/2)，让更多人能够方便地使用 Easydict。
+感谢 [@CanglongCl](https://github.com/CanglongCl) 提供的苹果开发者账号，解决了应用 [签名问题](https://github.com/iTvX/Easydict/issues/2)，让更多人能够方便地使用 Easydict。
 
 <a href="https://afdian.com/a/tisfeng"><img width="20%" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.jpg" alt=""></a>
 
@@ -129,10 +129,10 @@ Easydict 作为一个免费开源的非盈利项目，目前主要是作者个�
 
 ## Star History
 
-<a href="https://star-history.com/#tisfeng/easydict&Date">
+<a href="https://star-history.com/#iTvX/Easydict&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
   </picture>
 </a>
