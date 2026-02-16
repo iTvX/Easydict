@@ -28,7 +28,7 @@ jobs:
 
           DATE_UTC="$(date -u +'%Y.%m.%d')"
           TAG="v${DATE_UTC}-main.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
-          NAME="Main Release ${DATE_UTC} #${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+          NAME="Main Pre-release ${DATE_UTC} #${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
@@ -40,7 +40,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git tag -a "${{ steps.release_meta.outputs.tag }}" -m "Auto release for main ${GITHUB_SHA}"
+          git tag -a "${{ steps.release_meta.outputs.tag }}" -m "Auto pre-release for main ${GITHUB_SHA}"
           git push origin "${{ steps.release_meta.outputs.tag }}"
 
       - name: Select Xcode version
@@ -112,7 +112,7 @@ jobs:
           tag_name: ${{ steps.release_meta.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ steps.release_meta.outputs.name }}
-          prerelease: false
+          prerelease: true
           files: |
             ${{ steps.package.outputs.zip_path }}
             ${{ steps.package.outputs.shasum_path }}
