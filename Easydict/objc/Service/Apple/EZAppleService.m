@@ -376,8 +376,8 @@ static EZAppleService *_instance;
             self.result.translatedResults = @[ result.trim ];
         } else {
             self.result.promptTitle = @"如何在 Easydict 中使用 🍎 macOS 系统翻译？";
-            // https://github.com/tisfeng/Easydict/blob/main/docs/How-to-use-macOS-system-translation-in-Easydict-zh.md
-            NSString *docsURL = @"https://github.com/tisfeng/Easydict/blob/main/docs/How-to-use-macOS-system-translation-in-Easydict-%@.md";
+            // https://github.com/iTvX/Easydict/blob/main/docs/How-to-use-macOS-system-translation-in-Easydict-zh.md
+            NSString *docsURL = @"https://github.com/iTvX/Easydict/blob/main/docs/How-to-use-macOS-system-translation-in-Easydict-%@.md";
             NSString *language = @"zh";
             if ([to isEqualToString:EZLanguageEnglish]) {
                 language = @"en";

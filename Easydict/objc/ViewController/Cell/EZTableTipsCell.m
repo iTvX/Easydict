@@ -271,20 +271,20 @@
                 NSLocalizedString(@"tips_still_pop_up", nil),
             ],
             @"solveEn" : @[
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-is-the-text-empty-when-i-select-words-in-some-applications",
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-cant-i-use-mouse-hover-to-select-words-in-some-applications",
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-does-the-edit-button-in-the-upper-right-corner-flicker-when-selecting-words-in-some-applications",
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-do-word-selection-and-ocr-need-to-enable-system-related-permissions",
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-cant-i-select-words-on-some-web-pages-in-the-browser",
-                @"https://github.com/tisfeng/Easydict/wiki/FAQ#why-does-macos-still-pop-up-asking-for-permissions-even-though-i-have-given-easydict-the-accessibilityscreen-recording-permissions"
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-is-the-text-empty-when-i-select-words-in-some-applications",
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-cant-i-use-mouse-hover-to-select-words-in-some-applications",
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-does-the-edit-button-in-the-upper-right-corner-flicker-when-selecting-words-in-some-applications",
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-do-word-selection-and-ocr-need-to-enable-system-related-permissions",
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-cant-i-select-words-on-some-web-pages-in-the-browser",
+                @"https://github.com/iTvX/Easydict/wiki/FAQ#why-does-macos-still-pop-up-asking-for-permissions-even-though-i-have-given-easydict-the-accessibilityscreen-recording-permissions"
             ],
             @"solveZh" : @[
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%8F%96%E8%AF%8D%E6%96%87%E6%9C%AC%E4%B8%BA%E7%A9%BA",
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E4%B8%AD%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8%E9%BC%A0%E6%A0%87%E5%88%92%E8%AF%8D",
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E5%8F%96%E8%AF%8D%E6%97%B6%E5%8F%B3%E4%B8%8A%E8%A7%92%E7%BC%96%E8%BE%91%E6%8C%89%E9%92%AE%E4%BC%9A%E5%87%BA%E7%8E%B0%E9%97%AA%E7%83%81",
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%96%E8%AF%8D%E5%92%8C-ocr-%E9%9C%80%E8%A6%81%E5%BC%80%E5%90%AF%E7%B3%BB%E7%BB%9F%E7%9B%B8%E5%85%B3%E6%9D%83%E9%99%90",
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E6%9F%90%E4%BA%9B%E7%BD%91%E9%A1%B5%E6%97%A0%E6%B3%95%E5%8F%96%E8%AF%8D",
-                @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E5%B7%B2%E7%BB%8F%E7%BB%99-easydict-%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E5%BD%95%E5%B1%8F%E6%9D%83%E9%99%90-macos-%E4%BB%8D%E7%84%B6%E5%BC%B9%E7%AA%97%E8%A6%81%E6%B1%82%E7%BB%99%E4%BA%88%E6%9D%83%E9%99%90"
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%8F%96%E8%AF%8D%E6%96%87%E6%9C%AC%E4%B8%BA%E7%A9%BA",
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E4%B8%AD%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8%E9%BC%A0%E6%A0%87%E5%88%92%E8%AF%8D",
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E6%9F%90%E4%BA%9B%E5%BA%94%E7%94%A8%E5%8F%96%E8%AF%8D%E6%97%B6%E5%8F%B3%E4%B8%8A%E8%A7%92%E7%BC%96%E8%BE%91%E6%8C%89%E9%92%AE%E4%BC%9A%E5%87%BA%E7%8E%B0%E9%97%AA%E7%83%81",
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%96%E8%AF%8D%E5%92%8C-ocr-%E9%9C%80%E8%A6%81%E5%BC%80%E5%90%AF%E7%B3%BB%E7%BB%9F%E7%9B%B8%E5%85%B3%E6%9D%83%E9%99%90",
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E6%9F%90%E4%BA%9B%E7%BD%91%E9%A1%B5%E6%97%A0%E6%B3%95%E5%8F%96%E8%AF%8D",
+                @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#%E5%B7%B2%E7%BB%8F%E7%BB%99-easydict-%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E5%BD%95%E5%B1%8F%E6%9D%83%E9%99%90-macos-%E4%BB%8D%E7%84%B6%E5%BC%B9%E7%AA%97%E8%A6%81%E6%B1%82%E7%BB%99%E4%BA%88%E6%9D%83%E9%99%90"
             ],
         };
     }
@@ -294,9 +294,9 @@
 - (NSString *)seeMoreURL {
     if (!_seeMoreURL) {
         if ([EZLanguageManager.shared isSystemChineseFirstLanguage]) {
-            _seeMoreURL = @"https://github.com/tisfeng/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98";
+            _seeMoreURL = @"https://github.com/iTvX/Easydict/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98";
         } else {
-            _seeMoreURL = @"https://github.com/tisfeng/Easydict/wiki/FAQ";
+            _seeMoreURL = @"https://github.com/iTvX/Easydict/wiki/FAQ";
         }
     }
     return _seeMoreURL;

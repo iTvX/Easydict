@@ -45,7 +45,7 @@ struct AboutTab: View {
                 HStack(spacing: 15) {
                     Button {
                         NSWorkspace.shared.open(
-                            URL(string: "https://github.com/tisfeng/Easydict")!
+                            URL(string: "https://github.com/iTvX/Easydict")!
                         )
                     } label: {
                         Label("setting.about.github_link", systemSymbol: .starFill)
@@ -56,7 +56,7 @@ struct AboutTab: View {
                             .open(
                                 URL(
                                     string:
-                                    "https://github.com/tisfeng/Easydict/graphs/contributors"
+                                    "https://github.com/iTvX/Easydict/graphs/contributors"
                                 )!
                             )
                     } label: {
