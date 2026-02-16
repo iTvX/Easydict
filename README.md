@@ -3,11 +3,11 @@
   <h1 align="center">Easydict</h1>
   <h4 align="center">macOS Dictionary & AI Translation App</h4>
 <p align="center"> 
-<a href="https://github.com/tisfeng/easydict/blob/main/LICENSE">
-<img src="https://img.shields.io/github/license/tisfeng/easydict"
+<a href="https://github.com/iTvX/Easydict/blob/main/LICENSE">
+<img src="https://img.shields.io/github/license/iTvX/Easydict"
             alt="License"></a>
-<a href="https://github.com/tisfeng/Easydict/releases">
-<img src="https://img.shields.io/github/downloads/tisfeng/easydict/total.svg"
+<a href="https://github.com/iTvX/Easydict/releases">
+<img src="https://img.shields.io/github/downloads/iTvX/Easydict/total.svg"
             alt="Downloads"></a>
 <a href="https://img.shields.io/badge/-macOS-black?&logo=apple&logoColor=white">
 <img src="https://img.shields.io/badge/-macOS-black?&logo=apple&logoColor=white"
@@ -47,7 +47,7 @@ Easydict is ready to use out of the box, can automatically recognize the languag
 - 🌐 Support 20+ translation services (OpenAI, Gemini, DeepL, Google, Ollama, Groq, etc.)
 - 🗣️ Support for 48 languages
 
-**If you like this app, please consider giving it a [Star](https://github.com/tisfeng/Easydict) ⭐️, thanks! (^-^)**
+**If you like this app, please consider giving it a [Star](https://github.com/iTvX/Easydict) ⭐️, thanks! (^-^)**
 
 ## Contributing
 
@@ -72,10 +72,10 @@ brew install --cask easydict
 
 ### Manual Installation
 
-[Download](https://github.com/tisfeng/Easydict/releases) the latest release.
+[Download](https://github.com/iTvX/Easydict/releases) the latest release.
 
 > [!NOTE]
-> Latest version supports macOS 13.0+, for older systems please use [2.7.2](https://github.com/tisfeng/Easydict/releases/tag/2.7.2)
+> Latest version supports macOS 13.0+, for older systems please use [2.7.2](https://github.com/iTvX/Easydict/releases/tag/2.7.2)
 
 ---
 
@@ -109,13 +109,13 @@ brew install --cask easydict
 
 ## Statement
 
-Easydict is licensed under the [GPL-3.0](https://github.com/tisfeng/Easydict/blob/main/LICENSE) open source license, which is for learning and communication only. Anyone can get this product and source code for free. If you believe that your legal rights have been violated, please contact the [author](https://github.com/tisfeng) immediately. You can use the source code freely, but you must attach the corresponding license and copyright.
+Easydict is licensed under the [GPL-3.0](https://github.com/iTvX/Easydict/blob/main/LICENSE) open source license, which is for learning and communication only. Anyone can get this product and source code for free. If you believe that your legal rights have been violated, please contact the [author](https://github.com/iTvX) immediately. You can use the source code freely, but you must attach the corresponding license and copyright.
 
 ## Sponsor
 
 Easydict is a free and open source project, currently mainly developed and maintained by the author. If you like this project and find it helpful, you can consider sponsoring this project to support it, so that it can go further.
 
-Thanks to [@CanglongCl](https://github.com/CanglongCl) for providing the Apple Developer account, which solved the app [signature issue](https://github.com/tisfeng/Easydict/issues/2), allowing more people to use Easydict conveniently.
+Thanks to [@CanglongCl](https://github.com/CanglongCl) for providing the Apple Developer account, which solved the app [signature issue](https://github.com/iTvX/Easydict/issues/2), allowing more people to use Easydict conveniently.
 
 <a href="https://afdian.com/a/tisfeng"><img width="20%" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.jpg" alt=""></a>
 
@@ -129,10 +129,10 @@ Thanks to all sponsors for their generous support. For details, please see the [
 
 ## Star History
 
-<a href="https://star-history.com/#tisfeng/easydict&Date">
+<a href="https://star-history.com/#iTvX/Easydict&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=tisfeng/easydict&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=iTvX/Easydict&type=Date" />
   </picture>
 </a>
