@@ -7,8 +7,10 @@
 //
 
 import AFNetworking
+import Defaults
 import Foundation
 import JavaScriptCore
+import SwiftUI
 
 private let kGoogleTranslateURL = "https://translate.google.com"
 
@@ -16,6 +18,28 @@ private let kGoogleTranslateURL = "https://translate.google.com"
 
 @objc(EZGoogleService)
 class GoogleService: QueryService {
+    // MARK: Open
+
+    /// Returns configuration items for Google service settings.
+    /// Google Cloud TTS is optional. If no API key is provided, the service falls back to Google web TTS.
+    open override func configurationListItems() -> Any? {
+        ServiceConfigurationSecretSectionView(
+            service: self,
+            observeKeys: [.googleCloudTTSAPIKey, .googleCloudTTSVoiceName]
+        ) {
+            SecureInputCell(
+                textFieldTitleKey: "Google Cloud TTS API Key",
+                key: .googleCloudTTSAPIKey
+            )
+
+            InputCell(
+                textFieldTitleKey: "Google Cloud TTS Voice (Optional)",
+                key: .googleCloudTTSVoiceName,
+                placeholder: "en-US-Chirp3-HD-Achird"
+            )
+        }
+    }
+
     // MARK: - JavaScript Context
 
     lazy var jsContext: JSContext = {
@@ -260,13 +284,27 @@ class GoogleService: QueryService {
             throw QueryError(type: .parameter, message: "获取音频的文本为空")
         }
 
+        let processedText = (text as NSString).trimmingToMaxLength(5000)
+
+        if !googleCloudTTSAPIKey.isEmpty {
+            do {
+                return try await cloudTextToAudio(
+                    processedText,
+                    fromLanguage: fromLanguage,
+                    accent: accent
+                )
+            } catch {
+                logError("Google Cloud TTS failed, fallback to web TTS: \(error)")
+            }
+        }
+
         // TODO: need to optimize, Ref: https://github.com/florabtw/google-translate-tts/blob/master/src/synthesize.js
 
         if fromLanguage == .auto {
-            let lang = try await detectText(text)
-            let sign = signFunction.call(withArguments: [text])?.toString() ?? ""
+            let lang = try await detectText(processedText)
+            let sign = signFunction.call(withArguments: [processedText])?.toString() ?? ""
             let url = getAudioURL(
-                withText: text,
+                withText: processedText,
                 language: getTTSLanguageCode(lang, accent: accent),
                 sign: sign
             )
@@ -274,9 +312,9 @@ class GoogleService: QueryService {
         }
 
         try await updateWebAppTKK()
-        let sign = signFunction.call(withArguments: [text])?.toString() ?? ""
+        let sign = signFunction.call(withArguments: [processedText])?.toString() ?? ""
         let url = getAudioURL(
-            withText: text,
+            withText: processedText,
             language: getTTSLanguageCode(fromLanguage, accent: accent),
             sign: sign
         )
@@ -302,5 +340,119 @@ class GoogleService: QueryService {
 
         return
             "\(kGoogleTranslateURL)/translate_tts?ie=UTF-8&q=\(processedText.encode())&tl=\(language)&total=1&idx=0&textlen=\(processedText.count)&tk=\(sign)&client=webapp&prev=input"
+    }
+
+    // MARK: - Google Cloud TTS
+
+    private var googleCloudTTSAPIKey: String {
+        Defaults[.googleCloudTTSAPIKey].trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var googleCloudTTSVoiceName: String {
+        Defaults[.googleCloudTTSVoiceName].trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func cloudTextToAudio(
+        _ text: String,
+        fromLanguage: Language,
+        accent: String?
+    ) async throws
+        -> String? {
+        let detectedLanguage: Language
+        if fromLanguage == .auto {
+            detectedLanguage = try await detectText(text)
+        } else {
+            detectedLanguage = fromLanguage
+        }
+
+        let languageCode = getTTSLanguageCode(detectedLanguage, accent: accent)
+
+        var voice = GoogleCloudTTSRequest.Voice(languageCode: languageCode, name: nil)
+        if let customVoice = matchedCloudVoiceName(for: languageCode) {
+            voice.name = customVoice
+        }
+
+        let requestBody = GoogleCloudTTSRequest(
+            input: .init(text: text),
+            voice: voice,
+            audioConfig: .init(audioEncoding: "MP3")
+        )
+
+        var components = URLComponents(string: "https://texttospeech.googleapis.com/v1/text:synthesize")
+        components?.queryItems = [URLQueryItem(name: "key", value: googleCloudTTSAPIKey)]
+
+        guard let url = components?.url else {
+            throw QueryError(type: .api, message: "Invalid Google Cloud TTS URL")
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw QueryError(type: .api, message: "Invalid Google Cloud TTS response")
+        }
+
+        let cloudResponse = try JSONDecoder().decode(GoogleCloudTTSResponse.self, from: data)
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
+            let errorMessage = cloudResponse.error?.message ?? "Google Cloud TTS request failed"
+            throw QueryError(type: .api, message: errorMessage)
+        }
+
+        guard let audioContent = cloudResponse.audioContent,
+              let audioData = Data(base64Encoded: audioContent)
+        else {
+            throw QueryError(type: .api, message: "Google Cloud TTS returned empty audio content")
+        }
+
+        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("easydict-google-cloud-tts-\(UUID().uuidString).mp3")
+        try audioData.write(to: fileURL, options: .atomic)
+        return fileURL.path
+    }
+
+    private func matchedCloudVoiceName(for languageCode: String) -> String? {
+        let voiceName = googleCloudTTSVoiceName
+        guard !voiceName.isEmpty else { return nil }
+
+        let parts = voiceName.split(separator: "-")
+        guard parts.count >= 2 else { return voiceName }
+
+        let voiceLanguageCode = "\(parts[0])-\(parts[1])".lowercased()
+        if languageCode.lowercased().hasPrefix(voiceLanguageCode) {
+            return voiceName
+        }
+
+        return nil
+    }
+
+    private struct GoogleCloudTTSRequest: Encodable {
+        struct Input: Encodable {
+            let text: String
+        }
+
+        struct Voice: Encodable {
+            let languageCode: String
+            let name: String?
+        }
+
+        struct AudioConfig: Encodable {
+            let audioEncoding: String
+        }
+
+        let input: Input
+        let voice: Voice
+        let audioConfig: AudioConfig
+    }
+
+    private struct GoogleCloudTTSResponse: Decodable {
+        struct APIError: Decodable {
+            let message: String?
+        }
+
+        let audioContent: String?
+        let error: APIError?
     }
 }

@@ -331,6 +331,13 @@ extension Defaults.Keys {
     // Bing
     static let bingCookieKey = Key<String>(EZBingCookieKey, default: "")
 
+    // Google Cloud TTS
+    static let googleCloudTTSAPIKey = Key<String>("EZGoogleCloudTTSAPIKey", default: "")
+    static let googleCloudTTSVoiceName = Key<String>(
+        "EZGoogleCloudTTSVoiceName",
+        default: "en-US-Chirp3-HD-Achird"
+    )
+
     // niu
     static let niuTransAPIKey = Key<String>(EZNiuTransAPIKey, default: "")
 
