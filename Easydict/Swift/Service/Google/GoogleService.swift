@@ -367,10 +367,8 @@ class GoogleService: QueryService {
 
         let languageCode = getTTSLanguageCode(detectedLanguage, accent: accent)
 
-        var voice = GoogleCloudTTSRequest.Voice(languageCode: languageCode, name: nil)
-        if let customVoice = matchedCloudVoiceName(for: languageCode) {
-            voice.name = customVoice
-        }
+        let customVoice = matchedCloudVoiceName(for: languageCode)
+        let voice = GoogleCloudTTSRequest.Voice(languageCode: languageCode, name: customVoice)
 
         let requestBody = GoogleCloudTTSRequest(
             input: .init(text: text),
