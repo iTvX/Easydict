@@ -36,13 +36,11 @@ final class SelectionWorkflow {
             return
         }
 
-        let isFocusedTextField = systemUtility.isFocusedTextField()
-        logInfo("Is focused text field: \(isFocusedTextField ? "YES" : "NO")")
-
         Task {
             do {
                 let text = try await systemUtility.getSelectedText(strategy: .accessibility)?.trim() ?? ""
                 let editable = systemUtility.isFocusedTextField()
+                logInfo("Is focused text field: \(editable ? "YES" : "NO")")
                 isSelectedTextEditable = editable
                 let frontmostBundleID = frontmostApp?.bundleIdentifier ?? ""
                 let isBrowser = AppleScriptTask.isBrowserSupportingAppleScript(frontmostBundleID)
