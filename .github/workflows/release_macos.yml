@@ -17,7 +17,11 @@ concurrency:
 
 jobs:
   build-and-release:
-    runs-on: macos-15
+    runs-on:
+      - self-hosted
+      - macOS
+      - ARM64
+      - easydict-local
 
     steps:
       - name: Checkout repository
