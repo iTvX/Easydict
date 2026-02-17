@@ -33,6 +33,7 @@ final class EventMonitor: NSObject {
 
     private override init() {
         self.eventMonitorEngine = EventMonitorEngine()
+        self.pointerEventMonitorEngine = EventMonitorEngine()
         self.eventTapMonitor = EventTapMonitor()
         self.selectionWorkflow = SelectionWorkflow()
         self.triggerEvaluator = TriggerEvaluator()
@@ -114,6 +115,8 @@ final class EventMonitor: NSObject {
     }
 
     func addBothMonitor(_ isAutoSelectTextEnabled: Bool) {
+        isAutoSelectTextEnabledForMonitoring = isAutoSelectTextEnabled
+
         let eventMask: NSEvent.EventTypeMask = [
             .leftMouseDown,
             .leftMouseUp,
@@ -124,12 +127,12 @@ final class EventMonitor: NSObject {
             .leftMouseDragged,
             .cursorUpdate,
         ]
-        let maskWhenAutoSelectTextEnabled: NSEvent.EventTypeMask = [.scrollWheel, .mouseMoved]
-        let mask = isAutoSelectTextEnabled ? eventMask.union(maskWhenAutoSelectTextEnabled) : eventMask
 
-        bothMonitorWithEvent(mask) { [weak self] event in
+        bothMonitorWithEvent(eventMask) { [weak self] event in
             self?.handleMonitorEvent(event)
         }
+
+        updatePointerEventMonitoring()
     }
 
     func start() {
@@ -138,12 +141,23 @@ final class EventMonitor: NSObject {
 
     func stop() {
         eventMonitorEngine.stop()
+        pointerEventMonitorEngine.stop()
         eventTapMonitor.stop()
+        isPointerEventMonitorActive = false
+        if let keyDownMonitor {
+            NSEvent.removeMonitor(keyDownMonitor)
+            self.keyDownMonitor = nil
+        }
     }
 
     /// Monitor local and global events.
     func startMonitor() {
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        if let keyDownMonitor {
+            NSEvent.removeMonitor(keyDownMonitor)
+            self.keyDownMonitor = nil
+        }
+
+        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             if event.keyCode == kVK_Escape {
                 logInfo("escape")
             }
@@ -184,6 +198,7 @@ final class EventMonitor: NSObject {
     }
 
     private let eventMonitorEngine: EventMonitorEngine
+    private let pointerEventMonitorEngine: EventMonitorEngine
     private let eventTapMonitor: EventTapMonitor
     private let selectionWorkflow: SelectionWorkflow
     private let triggerEvaluator: TriggerEvaluator
@@ -191,6 +206,9 @@ final class EventMonitor: NSObject {
     private let appContextProvider: AppContextProvider
     private let systemUtility: SystemUtility
     private let languageDetector = AppleLanguageDetector()
+    private var keyDownMonitor: Any?
+    private var isAutoSelectTextEnabledForMonitoring = false
+    private var isPointerEventMonitorActive = false
 
     private var lastEvent: NSEvent?
     private var currentModifierFlags: NSEvent.ModifierFlags = []
@@ -227,9 +245,23 @@ final class EventMonitor: NSObject {
 
     private func handleMonitorEvent(_ event: NSEvent) {
         lastEvent = event
-        frontmostApplication = appContextProvider.frontmostApplication
         popButtonController.lastEvent = event
 
+        // mouseMoved / scrollWheel are high-frequency events.
+        // Keep their handling minimal and avoid unrelated state updates.
+        switch event.type {
+        case .mouseMoved:
+            guard popButtonController.isPopButtonVisible else { return }
+            popButtonController.handleMouseMoved(isMouseInExpandedFrame: isMouseInPopButtonExpandedFrame())
+            return
+        case .scrollWheel:
+            popButtonController.handleScrollWheel(event)
+            return
+        default:
+            break
+        }
+
+        frontmostApplication = appContextProvider.frontmostApplication
         let mouseLocation = NSEvent.mouseLocation
 
         switch event.type {
@@ -269,10 +301,6 @@ final class EventMonitor: NSObject {
             if popButtonController.isPopButtonVisible {
                 dismissPopButton()
             }
-        case .scrollWheel:
-            popButtonController.handleScrollWheel(event)
-        case .mouseMoved:
-            popButtonController.handleMouseMoved(isMouseInExpandedFrame: isMouseInPopButtonExpandedFrame())
         case .flagsChanged:
 //            log("flagsChanged, modifierFlags rawValue: \(event.modifierFlags.rawValue)")
 //            log("keyCode: \(event.keyCode)")
@@ -395,6 +423,7 @@ final class EventMonitor: NSObject {
             }
 
             popButtonController.isPopButtonVisible = true
+            updatePointerEventMonitoring()
             selectedText = trimmed
             cancelDismissPopButton()
             selectedTextBlock?(trimmed)
@@ -432,6 +461,7 @@ final class EventMonitor: NSObject {
         }
         dismissPopButtonBlock?()
         popButtonController.isPopButtonVisible = false
+        updatePointerEventMonitoring()
         eventTapMonitor.stop()
     }
 
@@ -529,5 +559,24 @@ final class EventMonitor: NSObject {
             insideCircleWithCenter: centerPoint,
             radius: Constants.expandedRadius
         )
+    }
+
+    /// Enables pointer-related monitors only when they are needed to manage
+    /// pop button visibility, reducing idle global event handling overhead.
+    private func updatePointerEventMonitoring() {
+        let shouldMonitorPointerEvents = isAutoSelectTextEnabledForMonitoring && popButtonController.isPopButtonVisible
+
+        if shouldMonitorPointerEvents {
+            guard !isPointerEventMonitorActive else { return }
+            pointerEventMonitorEngine.monitor(type: .both, mask: [.scrollWheel, .mouseMoved]) { [weak self] event in
+                self?.handleMonitorEvent(event)
+            }
+            isPointerEventMonitorActive = true
+            return
+        }
+
+        guard isPointerEventMonitorActive else { return }
+        pointerEventMonitorEngine.stop()
+        isPointerEventMonitorActive = false
     }
 }
