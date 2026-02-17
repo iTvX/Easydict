@@ -361,7 +361,8 @@ class GoogleService: QueryService {
         let languageCode = getTTSLanguageCode(detectedLanguage, accent: accent)
 
         let customVoice = matchedCloudVoiceName(for: languageCode)
-        let voice = GoogleCloudTTSRequest.Voice(languageCode: languageCode, name: customVoice)
+        let voiceLanguageCode = cloudVoiceLanguageCode(for: customVoice) ?? languageCode
+        let voice = GoogleCloudTTSRequest.Voice(languageCode: voiceLanguageCode, name: customVoice)
 
         let requestBody = GoogleCloudTTSRequest(
             input: .init(text: text),
@@ -412,11 +413,25 @@ class GoogleService: QueryService {
         guard parts.count >= 2 else { return voiceName }
 
         let voiceLanguageCode = "\(parts[0])-\(parts[1])".lowercased()
-        if languageCode.lowercased().hasPrefix(voiceLanguageCode) {
+        let normalizedLanguageCode = languageCode.lowercased()
+        if normalizedLanguageCode.hasPrefix(voiceLanguageCode) {
+            return voiceName
+        }
+
+        // Some language codes are generic (e.g. "en"). In that case, allow
+        // regional voices that share the same base language (e.g. "en-US-*").
+        if normalizedLanguageCode == parts[0].lowercased() {
             return voiceName
         }
 
         return nil
+    }
+
+    private func cloudVoiceLanguageCode(for voiceName: String?) -> String? {
+        guard let voiceName else { return nil }
+        let parts = voiceName.split(separator: "-")
+        guard parts.count >= 2 else { return nil }
+        return "\(parts[0])-\(parts[1])"
     }
 
     private struct GoogleCloudTTSRequest: Encodable {
