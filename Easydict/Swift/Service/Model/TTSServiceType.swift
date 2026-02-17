@@ -19,6 +19,20 @@ enum TTSServiceType: String, CaseIterable {
     case apple = "Apple"
 }
 
+enum GoogleTTSMode: String, CaseIterable, Defaults.Serializable {
+    case web
+    case api
+
+    var displayName: String {
+        switch self {
+        case .web:
+            "Google Web TTS (Default)"
+        case .api:
+            "Google Cloud TTS (API Key)"
+        }
+    }
+}
+
 // MARK: CustomLocalizedStringResourceConvertible
 
 extension TTSServiceType: CustomLocalizedStringResourceConvertible {
