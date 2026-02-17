@@ -10,7 +10,6 @@ import AFNetworking
 import Defaults
 import Foundation
 import JavaScriptCore
-import SwiftUI
 
 private let kGoogleTranslateURL = "https://translate.google.com"
 
@@ -21,23 +20,9 @@ class GoogleService: QueryService {
     // MARK: Open
 
     /// Returns configuration items for Google service settings.
-    /// Google Cloud TTS is optional. If no API key is provided, the service falls back to Google web TTS.
+    /// Google TTS mode and credentials are configured from Advanced settings.
     open override func configurationListItems() -> Any? {
-        ServiceConfigurationSecretSectionView(
-            service: self,
-            observeKeys: [.googleCloudTTSAPIKey, .googleCloudTTSVoiceName]
-        ) {
-            SecureInputCell(
-                textFieldTitleKey: "Google Cloud TTS API Key",
-                key: .googleCloudTTSAPIKey
-            )
-
-            InputCell(
-                textFieldTitleKey: "Google Cloud TTS Voice (Optional)",
-                key: .googleCloudTTSVoiceName,
-                placeholder: "en-US-Chirp3-HD-Achird"
-            )
-        }
+        nil
     }
 
     // MARK: - JavaScript Context
@@ -286,15 +271,19 @@ class GoogleService: QueryService {
 
         let processedText = (text as NSString).trimmingToMaxLength(5000)
 
-        if !googleCloudTTSAPIKey.isEmpty {
-            do {
-                return try await cloudTextToAudio(
-                    processedText,
-                    fromLanguage: fromLanguage,
-                    accent: accent
-                )
-            } catch {
-                logError("Google Cloud TTS failed, fallback to web TTS: \(error)")
+        if googleTTSMode == .api {
+            if !googleCloudTTSAPIKey.isEmpty {
+                do {
+                    return try await cloudTextToAudio(
+                        processedText,
+                        fromLanguage: fromLanguage,
+                        accent: accent
+                    )
+                } catch {
+                    logError("Google Cloud TTS failed, fallback to web TTS: \(error)")
+                }
+            } else {
+                logInfo("Google Cloud TTS mode is enabled, but API key is empty. Fallback to web TTS.")
             }
         }
 
@@ -346,6 +335,10 @@ class GoogleService: QueryService {
 
     private var googleCloudTTSAPIKey: String {
         Defaults[.googleCloudTTSAPIKey].trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var googleTTSMode: GoogleTTSMode {
+        Defaults[.googleTTSMode]
     }
 
     private var googleCloudTTSVoiceName: String {

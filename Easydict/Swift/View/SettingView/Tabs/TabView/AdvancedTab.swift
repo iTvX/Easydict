@@ -47,6 +47,59 @@ struct AdvancedTab: View {
                             .tag(option)
                     }
                 }
+
+                if defaultTTSServiceType == .google {
+                    Picker(
+                        selection: $googleTTSMode,
+                        label: AdvancedTabItemView(
+                            color: .mint,
+                            icon: .ellipsisBubbleFill,
+                            labelText: "Google TTS Mode"
+                        )
+                    ) {
+                        ForEach(GoogleTTSMode.allCases, id: \.rawValue) { option in
+                            Text(verbatim: option.displayName)
+                                .tag(option)
+                        }
+                    }
+
+                    if googleTTSMode == .api {
+                        LabeledContent {
+                            SecureField(
+                                "",
+                                text: $googleCloudTTSAPIKey,
+                                prompt: Text(verbatim: "Enter API key")
+                            )
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 260)
+                            .fixedSize(horizontal: true, vertical: false)
+                        } label: {
+                            AdvancedTabItemView(
+                                color: .green,
+                                icon: .highlighter,
+                                labelText: "Google Cloud TTS API Key"
+                            )
+                        }
+
+                        LabeledContent {
+                            TextField(
+                                "",
+                                text: $googleCloudTTSVoiceName,
+                                prompt: Text(verbatim: "en-US-Chirp3-HD-Achird")
+                            )
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 260)
+                            .fixedSize(horizontal: true, vertical: false)
+                        } label: {
+                            AdvancedTabItemView(
+                                color: .orange,
+                                icon: .book,
+                                labelText: "Google Cloud TTS Voice (Optional)"
+                            )
+                        }
+                    }
+                }
+
                 Toggle(isOn: $disableTipsView) {
                     AdvancedTabItemView(
                         color: .green,
@@ -419,6 +472,9 @@ struct AdvancedTab: View {
     @Default(.enableBetaFeature) private var enableBetaFeature
 
     @Default(.defaultTTSServiceType) private var defaultTTSServiceType
+    @Default(.googleTTSMode) private var googleTTSMode
+    @Default(.googleCloudTTSAPIKey) private var googleCloudTTSAPIKey
+    @Default(.googleCloudTTSVoiceName) private var googleCloudTTSVoiceName
     @Default(.disableTipsView) private var disableTipsView
     @Default(.enableYoudaoOCR) private var enableYoudaoOCR
     @Default(.enableCompatibilityReplace) private var enableCompatibilityReplace
