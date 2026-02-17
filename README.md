@@ -36,6 +36,15 @@ This fork includes a fix for voice matching behavior:
 - Request `voice.languageCode` is aligned with selected voice prefix when needed.
 - This avoids silent fallback to default web voice and makes voice changes actually audible.
 
+### 4. Lower Idle CPU Usage for Auto-Select Monitoring
+
+This fork also includes event-monitor performance optimizations for mouse selection workflows:
+
+- High-frequency pointer events (`mouseMoved`, `scrollWheel`) now use a lightweight hot path.
+- Pointer monitors are enabled only when needed (for example, when the pop button is visible).
+- Duplicate focus checks in the selection workflow are removed.
+- Pop button behavior and trigger logic remain unchanged.
+
 ## Quick Start
 
 1. Download the latest release from the [Releases](https://github.com/iTvX/Easydict/releases) page.
