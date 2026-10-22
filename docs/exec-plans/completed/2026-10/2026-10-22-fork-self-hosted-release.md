@@ -1,6 +1,6 @@
 # Fork 自托管 Runner 自动发布
 
-- 状态：active
+- 状态：completed
 - 创建日期：2026-10-22
 - 负责人：Claude Code
 - 关联 Issue/PR：none
@@ -65,7 +65,7 @@ App 的 Sparkle 地址、公钥和“新版本”检查也都指向上游，fork
 - [x] App 更新地址与公钥
 - [x] 凭据配置（专用钥匙串、复用 `lotus-notary`、Sparkle 密钥）与 preflight
 - [x] 文档与路由
-- [ ] runner 注册、外部 PR 审批策略、推送 `dev` 与首次发布验证
+- [x] runner 注册、外部 PR 审批策略、推送 `dev` 与首次发布验证
 
 ## 验证
 
@@ -81,6 +81,12 @@ App 的 Sparkle 地址、公钥和“新版本”检查也都指向上游，fork
 - 使用 runner 私有配置运行 `fork-release.sh preflight`：通过。
 - 代码审查后修复：移除失败日志 artifact（避免在公开仓库泄露本机路径，日志改留本机缓存目录）、
   checkout action 固定到提交 SHA、文档改正“失败不公开”的范围。
+- 首次发布：runner `easydict-admins-mac-mini` 执行 Fork Release run 39842145865 成功，发布
+  `2.25.0.69`（Tag 指向 `23536d82`，非 Draft、非预发布、为 latest），App 与 DMG 均获 Apple 接受。
+- 匿名下载核对：`SHA256SUMS.txt` 校验通过；ZIP 的 EdDSA 签名与 `SUPublicEDKey` 匹配；解压后的
+  App `codesign --verify --deep --strict` 通过，团队 `AW54C93V4H`、带时间戳，`stapler validate`
+  与 `spctl` 均为 Notarized Developer ID；DMG 同样通过；`releases/latest/download/appcast.xml`
+  提供构建 69。
 
 ## 完成条件
 

@@ -1,6 +1,6 @@
 ## 2026-10-22 | 任务：为 fork 配置自托管 runner 自动发布
 
-**Links:** [计划](../../exec-plans/active/2026-10-22-fork-self-hosted-release.md)
+**Links:** [计划](../../exec-plans/completed/2026-10/2026-10-22-fork-self-hosted-release.md)、[Release 2.25.0.69](https://github.com/iTvX/Easydict/releases/tag/2.25.0.69)
 
 ### 执行上下文
 
@@ -44,7 +44,11 @@
   `2.25.0.69 (69)` universal；按脚本顺序 ad-hoc 签名后 `codesign --verify --deep --strict` 通过。
 - 使用 runner 私有配置运行 `fork-release.sh preflight`：通过（Developer ID 团队 `AW54C93V4H`、
   公证 profile、Sparkle 公私钥配对、更新地址）。
-- 未运行：Developer ID 实际签名、Apple 公证与真实发布，待 runner 注册并推送 `dev` 后验证。
+- 首次真实发布：runner `easydict-admins-mac-mini` 的 Fork Release 运行成功，发布 `2.25.0.69`；
+  App 与 DMG 均获 Apple 公证并 staple。匿名下载后核对校验和、EdDSA 签名、`codesign --deep
+  --strict`、`stapler validate` 与 `spctl`（Notarized Developer ID，团队 `AW54C93V4H`），公开
+  feed 提供构建 69：全部通过。
+- 未验证：已安装 fork 版本后的 Sparkle 自动更新，需要下一个版本发布后才能观察。
 
 ### 受影响文件
 
@@ -58,10 +62,9 @@
 - `Easydict/Swift/Utility/Constants/AppConstants.swift`
 - `Easydict/Swift/Utility/GitHubReleaseFetcher.swift`
 - `docs/releases/fork-release.md`
-- `docs/exec-plans/active/2026-10-22-fork-self-hosted-release.md`
+- `docs/exec-plans/completed/2026-10/2026-10-22-fork-self-hosted-release.md`
 - `AGENTS.md`
 
 ### 后续事项
 
-- 经 Max 确认后注册 runner、设置外部贡献者 PR 审批、推送 `dev` 并验证首次发布，然后归档计划。
 - 已安装上游版本的设备需手动安装一次 fork 的 DMG，并重新授予辅助功能等权限。
