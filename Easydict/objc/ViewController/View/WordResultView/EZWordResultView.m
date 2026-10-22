@@ -171,6 +171,15 @@ static BOOL EZResultHasAnkiContent(EZQueryResult *result) {
     WKWebView *webView = shouldRenderHTML ? result.webViewManager.webView : nil;
     self.webView = webView;
 
+    // NSTextView autoreleases its delegate when it is deallocated, and the old labels can
+    // outlive this refresh in deferred AppKit work that runs without a local autorelease
+    // pool. That autorelease would keep this view, its service and its whole subview tree
+    // alive until the next NSEvent drains the main thread's pool, so detach first.
+    for (NSView *subview in self.subviews) {
+        if ([subview isKindOfClass:NSTextView.class]) {
+            ((NSTextView *)subview).delegate = nil;
+        }
+    }
     [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 
     __block CGFloat height = 0;
@@ -428,6 +437,7 @@ static BOOL EZResultHasAnkiContent(EZQueryResult *result) {
             EZAudioPlayer *audioPlayer = [[EZAudioPlayer alloc] init];
             audioButton.audioPlayer = audioPlayer;
             [audioButton setPlayAudioBlock:^{
+                mm_strongify(self);
                 [audioPlayer playWordPhonetic:obj designatedService:self.service];
             }];
 
@@ -890,7 +900,9 @@ static BOOL EZResultHasAnkiContent(EZQueryResult *result) {
         audioButton.toolTip = [NSString stringWithFormat:@"%@", action];
     }];
 
+    mm_weakify(self);
     [audioButton setPlayAudioBlock:^{
+        mm_strongify(self);
         NSString *text = result.copiedText;
 
         // For some special case, copied text language is not the queryTargetLanguage, like 龘, Youdao translate.
@@ -1051,7 +1063,6 @@ static BOOL EZResultHasAnkiContent(EZQueryResult *result) {
         markdownToggleButton.enabled = hasTranslatedText;
         markdownToggleButton.mas_key = @"result_markdownToggleButton";
 
-        mm_weakify(self);
         markdownToggleButton.clickAction = ^{
             mm_strongify(self);
             [result toggleMarkdownRendering];
