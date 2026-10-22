@@ -43,22 +43,6 @@ final class AppContextProvider {
         return type
     }
 
-    func recordSelectTextInfo(updateURL: @escaping (String?) -> ()) {
-        let frontmostApp = frontmostApplication
-        let bundleID = frontmostApp?.bundleIdentifier ?? ""
-        Task {
-            do {
-                let urlString = try await AppleScriptTask.getCurrentTabURLFromBrowser(bundleID)
-                logInfo("Get browser tab url: \(String(describing: urlString))")
-                await MainActor.run {
-                    updateURL(urlString)
-                }
-            } catch {
-                logError("Failed to get browser tab url: \(error)")
-            }
-        }
-    }
-
     func useAccessibilityForFirstTime() -> Bool {
         let defaults = UserDefaults.standard
         let hasUsedAutoSelectText = defaults.bool(forKey: Constants.hasUsedAutoSelectTextKey)

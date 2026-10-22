@@ -157,7 +157,9 @@ typedef void (^EZURLSessionTaskCompletionHandler)(NSURLResponse *_Nonnull respon
 static EZURLSchemeHandler *_sharedInstance = nil;
 
 /// Hook method +handlesURLScheme
-+ (void)load {
+/// Installed on first use instead of +load: EZWebViewTranslator is currently unused,
+/// so the app should not swizzle WKWebView at launch.
++ (void)installHandlesURLSchemeHookIfNeeded {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Method originalMethod = class_getClassMethod([WKWebView class], @selector(handlesURLScheme:));
@@ -176,6 +178,9 @@ static EZURLSchemeHandler *_sharedInstance = nil;
 
 - (instancetype)init {
     if (self = [super init]) {
+        // Must run before this handler is registered for the https scheme.
+        [EZURLSchemeHandler installHandlesURLSchemeHookIfNeeded];
+
         self.lock = [[NSLock alloc] init];
         self.operationQueue = [[NSOperationQueue alloc] init];
         self.operationQueue.maxConcurrentOperationCount = 1;

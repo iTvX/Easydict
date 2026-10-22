@@ -9,6 +9,9 @@
 #import "EZLayoutManager.h"
 #import "EZBaseQueryWindow.h"
 
+/// Window moves and live resizes report every frame; saved frames are only read at launch.
+static NSTimeInterval const EZWindowFrameSavingDelay = 0.5;
+
 
 @interface EZLayoutManager ()
 
@@ -16,6 +19,10 @@
 @property (nonatomic, assign) CGSize minimumWindowSize;
 /// Maximum window frame size of clicked window
 @property (nonatomic, assign) CGSize maximumWindowSize;
+
+/// Latest window frames not yet written to user defaults, keyed by window type.
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSValue *> *unsavedWindowFrames;
+@property (nonatomic, assign) BOOL windowFrameSavingScheduled;
 
 @end
 
@@ -67,6 +74,18 @@ static EZLayoutManager *_instance;
         self.mainWindowFrame = [self defaultWindowFrameWithType:EZWindowTypeMain];
         [configuration setWindowFrame:self.mainWindowFrame windowType:EZWindowTypeMain];
     }
+
+    self.unsavedWindowFrames = [NSMutableDictionary dictionary];
+
+    // Delivered synchronously on the main thread, so pending frames are saved before the process exits.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationWillTerminate:)
+                                                 name:NSApplicationWillTerminateNotification
+                                               object:nil];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification {
+    [self saveUnsavedWindowFrames];
 }
 
 - (void)setScreen:(NSScreen *)screen {
@@ -214,7 +233,7 @@ static EZLayoutManager *_instance;
     CGRect windowFrame = window.frame;
 
     // Record floating window frame
-    [MyConfiguration.shared setWindowFrame:windowFrame windowType:windowType];
+    [self scheduleSavingWindowFrame:windowFrame windowType:windowType];
 
     switch (windowType) {
         case EZWindowTypeMain:
@@ -229,7 +248,12 @@ static EZLayoutManager *_instance;
 
                 // Update lastPoint to update current active screen
                 EZWindowManager.shared.lastPoint = fixedWindowCenter;
-                MyConfiguration.shared.formerFixedScreenVisibleFrame = self.screen.visibleFrame;
+
+                // This value is read when showing the window, so write it right away, but only when it changes.
+                CGRect screenVisibleFrame = self.screen.visibleFrame;
+                if (!CGRectEqualToRect(MyConfiguration.shared.formerFixedScreenVisibleFrame, screenVisibleFrame)) {
+                    MyConfiguration.shared.formerFixedScreenVisibleFrame = screenVisibleFrame;
+                }
             }
             break;
         }
@@ -240,12 +264,42 @@ static EZLayoutManager *_instance;
                 CGPoint fixedWindowCenter = NSMakePoint(NSMidX(windowFrame), NSMidY(windowFrame));
 
                 EZWindowManager.shared.lastPoint = fixedWindowCenter;
-                MyConfiguration.shared.formerMiniScreenVisibleFrame = self.screen.visibleFrame;
+
+                CGRect screenVisibleFrame = self.screen.visibleFrame;
+                if (!CGRectEqualToRect(MyConfiguration.shared.formerMiniScreenVisibleFrame, screenVisibleFrame)) {
+                    MyConfiguration.shared.formerMiniScreenVisibleFrame = screenVisibleFrame;
+                }
             }
             break;
         default:
             break;
     }
+}
+
+/// Saves the latest frame of each window type once, after a burst of move or resize updates.
+- (void)scheduleSavingWindowFrame:(CGRect)frame windowType:(EZWindowType)windowType {
+    self.unsavedWindowFrames[@(windowType)] = [NSValue valueWithRect:frame];
+    if (self.windowFrameSavingScheduled) {
+        return;
+    }
+
+    // A fixed deadline merges per-frame updates without postponing the save for a long drag.
+    // The app supports sudden termination, which skips willTerminate, so block it until the save.
+    self.windowFrameSavingScheduled = YES;
+    [NSProcessInfo.processInfo disableSuddenTermination];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(EZWindowFrameSavingDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.windowFrameSavingScheduled = NO;
+        [self saveUnsavedWindowFrames];
+        [NSProcessInfo.processInfo enableSuddenTermination];
+    });
+}
+
+- (void)saveUnsavedWindowFrames {
+    NSDictionary<NSNumber *, NSValue *> *windowFrames = [self.unsavedWindowFrames copy];
+    [self.unsavedWindowFrames removeAllObjects];
+    [windowFrames enumerateKeysAndObjectsUsingBlock:^(NSNumber *windowType, NSValue *frame, BOOL *stop) {
+        [MyConfiguration.shared setWindowFrame:frame.rectValue windowType:(EZWindowType)windowType.integerValue];
+    }];
 }
 
 - (BOOL)showInputTextField:(EZWindowType)windowType {

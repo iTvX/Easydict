@@ -16,32 +16,6 @@ import Vapor
 
 @MainActor
 class VaporServer {
-    // MARK: Lifecycle
-
-    init() {
-        do {
-            // Vapor template code https://github.com/vapor/template-bare/blob/main/Sources/App/entrypoint.swift
-
-            self.env = try Environment.detect()
-            guard var env else {
-                return
-            }
-
-            // These code should be run only once.
-            try LoggingSystem.bootstrap(from: &env)
-
-            // This attempts to install NIO as the Swift Concurrency global executor.
-            // You should not call any async functions before this point.
-            let executorTakeoverSuccess = NIOSingletons
-                .unsafeTryInstallSingletonPosixEventLoopGroupAsConcurrencyGlobalExecutor()
-            logInfo(
-                "Running with \(executorTakeoverSuccess ? "SwiftNIO" : "standard") Swift Concurrency default executor"
-            )
-        } catch {
-            logError("Failed to detect environment: \(error)")
-        }
-    }
-
     // MARK: Internal
 
     static let shared = VaporServer()
@@ -79,7 +53,44 @@ class VaporServer {
 
     // MARK: Private
 
+    /// Whether the one-time Vapor environment setup has run.
+    private var didSetUpEnvironment = false
+
+    /// Detects the Vapor environment and bootstraps logging once per process.
+    ///
+    /// Deferred until the server first starts, so launch skips this work while the server is disabled.
+    private func setUpEnvironmentIfNeeded() {
+        guard !didSetUpEnvironment else {
+            return
+        }
+        didSetUpEnvironment = true
+
+        do {
+            // Vapor template code https://github.com/vapor/template-bare/blob/main/Sources/App/entrypoint.swift
+
+            self.env = try Environment.detect()
+            guard var env else {
+                return
+            }
+
+            // These code should be run only once.
+            try LoggingSystem.bootstrap(from: &env)
+
+            // This attempts to install NIO as the Swift Concurrency global executor.
+            // You should not call any async functions before this point.
+            let executorTakeoverSuccess = NIOSingletons
+                .unsafeTryInstallSingletonPosixEventLoopGroupAsConcurrencyGlobalExecutor()
+            logInfo(
+                "Running with \(executorTakeoverSuccess ? "SwiftNIO" : "standard") Swift Concurrency default executor"
+            )
+        } catch {
+            logError("Failed to detect environment: \(error)")
+        }
+    }
+
     private func start() async throws {
+        setUpEnvironmentIfNeeded()
+
         guard let env else {
             return
         }

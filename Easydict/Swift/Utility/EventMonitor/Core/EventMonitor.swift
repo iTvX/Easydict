@@ -62,9 +62,6 @@ final class EventMonitor: NSObject {
     var selectTextType: EZSelectTextType = .accessibility
     var triggerType: EZTriggerType = []
 
-    var frontmostApplication: NSRunningApplication?
-    var browserTabURLString: String?
-
     var startPoint: CGPoint = .zero
     var endPoint: CGPoint = .zero
 
@@ -207,6 +204,8 @@ final class EventMonitor: NSObject {
         static let highFrequencyEventMask: NSEvent.EventTypeMask = [.scrollWheel, .mouseMoved]
         /// Throttle interval for mouse-moved events to reduce CPU usage.
         static let mouseMovedThrottleInterval: TimeInterval = 0.1
+        /// Number of leading characters used to detect the language of a selection.
+        static let maxLanguageDetectionLength = 1000
     }
 
     private let eventMonitorEngine: EventMonitorEngine
@@ -242,9 +241,6 @@ extension EventMonitor {
 
         selectionWorkflow.contextProvider = appContextProvider
         selectionWorkflow.systemUtility = systemUtility
-        selectionWorkflow.onBrowserURLUpdated = { [weak self] urlString in
-            self?.browserTabURLString = urlString
-        }
 
         selectionWorkflow.onStartMonitoringKeyboard = { [weak self] in
             guard MyConfiguration.shared.autoSelectText else { return }
@@ -274,7 +270,6 @@ extension EventMonitor {
         lastEvent = event
         popButtonController.lastEvent = event
 
-        frontmostApplication = appContextProvider.frontmostApplication
         let mouseLocation = NSEvent.mouseLocation
 
         switch event.type {
@@ -564,7 +559,11 @@ extension EventMonitor {
         }
 
         let excludedLanguage = config.autoShowQueryIconExcludedLanguage
-        let detectedLanguage = languageDetector.detectLanguage(text: text)
+        // The pop-button decision only needs the dominant language, so analyze a prefix to keep
+        // Cmd+A on a long document from scanning the whole text.
+        let detectedLanguage = languageDetector.detectLanguage(
+            text: String(text.prefix(Constants.maxLanguageDetectionLength))
+        )
         let shouldShowAutoQueryIcon = detectedLanguage != excludedLanguage
         logInfo(
             "detected language: \(detectedLanguage), excluded language: \(excludedLanguage), shouldShowAutoQueryIcon: \(shouldShowAutoQueryIcon)"

@@ -11,7 +11,6 @@ extension AppleScriptTask {
 
     /// Browser action types for better abstraction
     enum BrowserAction {
-        case getCurrentTabURL
         case getSelectedText
         case getTextFieldText
         case insertText(String)
@@ -32,10 +31,6 @@ extension AppleScriptTask {
 
     class func getSelectedTextFromBrowser(_ bundleID: String) async throws -> String? {
         try await executeBrowserAction(.getSelectedText, bundleID: bundleID)
-    }
-
-    class func getCurrentTabURLFromBrowser(_ bundleID: String) async throws -> String? {
-        try await executeBrowserAction(.getCurrentTabURL, bundleID: bundleID)
     }
 
     class func insertTextInBrowser(_ text: String, bundleID: String) async throws -> Bool {
@@ -89,14 +84,6 @@ extension AppleScriptTask {
         script: String, timeout: TimeInterval?, logMessage: String
     ) {
         switch action {
-        case .getCurrentTabURL:
-            let script = """
-            tell application id "\(bundleID)"
-               set theUrl to URL of active tab of front window
-            end tell
-            """
-            return (script, nil, "Chrome current tab URL")
-
         case .getSelectedText:
             let script = """
             tell application id "\(bundleID)"
@@ -151,14 +138,6 @@ extension AppleScriptTask {
         script: String, timeout: TimeInterval?, logMessage: String
     ) {
         switch action {
-        case .getCurrentTabURL:
-            let script = """
-            tell application id "\(bundleID)"
-               set theUrl to URL of front document
-            end tell
-            """
-            return (script, nil, "Safari current tab URL")
-
         case .getSelectedText:
             let script = """
             tell application id "\(bundleID)"

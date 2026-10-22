@@ -385,9 +385,7 @@ extension GoogleService {
                 return
             }
             if let tkk = tkk {
-                windowObject.setObject(
-                    tkk, forKeyedSubscript: "TKK" as NSCopying & NSObjectProtocol
-                )
+                updateSignTKK(tkk)
                 completion(nil)
             } else {
                 completion(error)

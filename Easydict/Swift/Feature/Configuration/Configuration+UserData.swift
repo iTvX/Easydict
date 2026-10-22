@@ -33,7 +33,10 @@ extension MyConfiguration {
     func resetUserDefaultsData() {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
         CodexRequestCoordinator.shared.reset()
+        // Finish queued record writes first so they cannot restore records after the reset.
+        QueryRecordManager.shared.flush()
         UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
+        QueryRecordManager.shared.discardCachedRecords()
     }
 
     func writeDictToDownloadFolder(_ dict: [String: Any]) {

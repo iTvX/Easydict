@@ -39,9 +39,17 @@ extension NSScreen {
         ).integral
 
         // Crop the image to the specified rect
-        guard let croppedImage = displayImage.cropping(to: scaledCropRect) else {
+        guard var croppedImage = displayImage.cropping(to: scaledCropRect) else {
             NSLog("Failed to crop display image")
             return nil
+        }
+
+        // A cropped CGImage keeps the whole display capture alive, which is about 69 MB on a
+        // 6400x2700 display, for as long as the OCR image is retained. Copy partial captures into
+        // their own bitmap so only the selected area stays in memory.
+        if croppedImage.width < displayImage.width || croppedImage.height < displayImage.height,
+           let standaloneImage = croppedImage.standaloneCopy() {
+            croppedImage = standaloneImage
         }
 
         let image = NSImage(cgImage: croppedImage, size: .zero)
@@ -135,6 +143,28 @@ extension NSScreen {
     /// Get the current mouse screen
     class func currentMouseScreen() -> NSScreen? {
         screens.first { $0.frame.contains(NSEvent.mouseLocation) }
+    }
+}
+
+extension CGImage {
+    /// Draws the image into a new bitmap that does not share storage with the source image.
+    fileprivate func standaloneCopy() -> CGImage? {
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace ?? CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+                | CGBitmapInfo.byteOrder32Little.rawValue
+        )
+        else {
+            return nil
+        }
+
+        context.draw(self, in: CGRect(x: 0, y: 0, width: width, height: height))
+        return context.makeImage()
     }
 }
 
