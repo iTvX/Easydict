@@ -164,7 +164,6 @@ struct GeneralTab: View {
                     Spacer()
                     Toggle(
                         isOn: $includeBetaUpdates.didSet(execute: { state in
-                            logSettings(["include_beta_updates": state])
                             if state {
                                 MyConfiguration.shared.updater.checkForUpdates()
                             }
@@ -177,9 +176,6 @@ struct GeneralTab: View {
 
                 LaunchAtLogin.Toggle {
                     Text("launch_at_startup")
-                }
-                .onChange(of: LaunchAtLogin.isEnabled) { newValue in
-                    logSettings(["launch_at_startup": newValue])
                 }
 
                 Toggle(
@@ -326,10 +322,6 @@ struct GeneralTab: View {
 
     private var shortcutsHaveSetuped: Bool {
         Defaults[.inputShortcut] != nil || Defaults[.selectionShortcut] != nil
-    }
-
-    private func logSettings(_ parameters: [String: Any]) {
-        AnalyticsService.logEvent(withName: "settings", parameters: parameters)
     }
 }
 

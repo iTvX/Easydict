@@ -84,11 +84,6 @@
     } else {
         [windowManager.floatingWindow.queryViewController startQueryText:self.queryText actionType:actionType];
     }
-
-    NSDictionary *parameters = @{
-        @"floating_window_type" : @(floatingWindowType),
-    };
-    [EZAnalyticsService logEventWithName:@"query_in_app" parameters:parameters];
 }
 
 - (nullable NSString *)selectedText {

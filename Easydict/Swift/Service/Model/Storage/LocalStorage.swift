@@ -364,13 +364,6 @@ final class LocalStorage: NSObject {
         if currentCount == 0 || newLevel != currentLevel {
             let levelTitle = queryLevelTitle(newLevel, chineseFlag: true)
             logInfo("new level: \(levelTitle)")
-
-            let dict: [String: String] = [
-                "count": "\(newCount)",
-                "level": "\(newLevel)",
-                "title": levelTitle,
-            ]
-            AnalyticsService.logEvent(withName: "query_count", parameters: dict)
         }
 
         queryCount = newCount
@@ -387,8 +380,6 @@ final class LocalStorage: NSObject {
         record.queryCount += 1
         record.queryCharacterCount += queryLength
         setQueryServiceRecord(record, serviceType: serviceType)
-
-        AnalyticsService.logQueryService(service)
     }
 
     /// Checks whether a service has free quota left for the current user.

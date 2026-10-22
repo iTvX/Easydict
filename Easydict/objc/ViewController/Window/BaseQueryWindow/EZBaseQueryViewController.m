@@ -134,8 +134,6 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
     if (!self.isUpdatingWindowFrameInternally) {
         [self applyWindowHeightAnimated:NO];
     }
-
-    [EZAnalyticsService logWindowAppear:self.windowType];
 }
 
 
@@ -552,13 +550,6 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
         // !!!: inputText should be used here, not queryText, queryText may be modified, such as easydict://query?text=xxx
         NSString *inputText = queryModel.inputText;
         MMLogInfo(@"ocr result: %@", inputText);
-
-        NSDictionary *dict = @{
-            @"detectedLanguage" : queryModel.detectedLanguage,
-            @"actionType" : actionType,
-        };
-        [EZAnalyticsService logEventWithName:@"ocr" parameters:dict];
-
 
         if (actionType == EZActionTypeScreenshotOCR) {
             [inputText copyToPasteboard];
@@ -1533,12 +1524,6 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
             [self retryQueryWithLanguage:language];
 
             [self updateSelectLanguageCell];
-
-            NSDictionary *dict = @{
-                @"autoDetect" : detectedLanguage,
-                @"userSelect" : language,
-            };
-            [EZAnalyticsService logEventWithName:@"change_detected_language" parameters:dict];
         }
     }];
 

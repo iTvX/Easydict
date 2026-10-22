@@ -111,10 +111,6 @@ typedef NS_OPTIONS(NSUInteger, EZTriggerType) {
 
 @interface EZEnumTypes : NSObject
 
-+ (NSString *)stringValueOfTriggerType:(EZTriggerType)triggerType;
-
-+ (NSString *)windowName:(EZWindowType)type;
-
 + (MMOrderedDictionary *)fixedWindowPositionDict;
 
 + (MMOrderedDictionary *)translateWindowTypeDict;

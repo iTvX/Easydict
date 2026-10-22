@@ -37,12 +37,6 @@ final class DeviceSystemInfo: NSObject {
         ]
     }
 
-    /// Returns the system version as a semantic string, for example "14.0.0".
-    static func getSystemVersion() -> String {
-        let version = ProcessInfo.processInfo.operatingSystemVersion
-        return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
-    }
-
     // MARK: Private
 
     /// Returns the device model identifier, for example "MacBookPro18,1".

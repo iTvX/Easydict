@@ -41,19 +41,9 @@
     [EZWindowManager.shared activeLastFrontmostApplication];
 
     NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
-    NSString *bundleID = app.bundleIdentifier;
-    NSString *textLengthRange = [EZAnalyticsService textLengthRange:replacementString];
     BOOL useCompatibilityMode = MyConfiguration.shared.enableCompatibilityReplace;
-
-    NSDictionary *parameters = @{
-        @"floating_window_type" : @(EZWindowManager.shared.floatingWindowType),
-        @"app_name" : app.localizedName,
-        @"bundle_id" : bundleID,
-        @"text_length" : textLengthRange,
-        @"use_compatibility_mode" : @(useCompatibilityMode)
-    };
-    [EZAnalyticsService logEventWithName:@"replace_selected_text" parameters:parameters];
-    MMLogInfo(@"repalce selected text: %@", parameters);
+    MMLogInfo(@"replace selected text in %@, length: %lu, compatibility mode: %d",
+              app.bundleIdentifier, (unsigned long)replacementString.length, useCompatibilityMode);
 
     /**
      Since some apps (such as Browsers) environment is complex, use Accessibility to replace text may fail, so it is better to use key event to replace text. Fix https://github.com/tisfeng/Easydict/issues/622

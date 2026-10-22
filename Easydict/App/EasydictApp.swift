@@ -22,8 +22,6 @@ enum EasydictCmpatibilityEntry {
 
         // Capturing crash logs must be placed first.
         MMCrash.registerHandler()
-        AnalyticsService.setupCrashService()
-        AnalyticsService.logAppInfo()
 
         // Workaround for macOS 26 Tahoe WindowServer high GPU load: NSWindow subclasses
         // that directly override `_cornerMask` defeat AppKit's mask cache and force the
