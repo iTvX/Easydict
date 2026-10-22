@@ -25,8 +25,13 @@ final class AppConstants: NSObject {
     /// Repository full name, eg. tisfeng/Easydict
     static let repoName = "tisfeng/Easydict"
     static let repoURL = URL(string: "https://github.com/\(repoName)")!
-    static let releasesURL = repoURL.appending(path: "releases")
     static let issuesURL = repoURL.appending(path: "issues")
+
+    /// Repository that publishes this build's releases and Sparkle feed.
+    ///
+    /// Keep it in sync with `SUFeedURL` in Info.plist.
+    static let releaseRepoName = "iTvX/Easydict"
+    static let releasesURL = URL(string: "https://github.com/\(releaseRepoName)/releases")!
 
     // MARK: - Network
 

@@ -17,11 +17,11 @@ enum GitHubReleaseFetcher {
 
     /// Get the latest release version.
     /// - Parameters:
-    ///   - repo: repo name, eg. tisfeng/Easydict
+    ///   - repo: repo name, eg. iTvX/Easydict
     ///   - includePrerelease: include pre-releases
     /// - Returns: release tag name, eg. 2.7.2, or nil if the request fails.
     static func latestVersion(
-        of repo: String = AppConstants.repoName,
+        of repo: String = AppConstants.releaseRepoName,
         includePrerelease: Bool
     ) async
         -> String? {

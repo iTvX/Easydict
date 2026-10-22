@@ -61,9 +61,9 @@
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/tisfeng/Easydict/main/appcast.xml</string>
+	<string>https://github.com/iTvX/Easydict/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string>9Ee1FtAsmJHFD79H4bToJhAOJmTtkTYIUDr23ofEWiU=</string>
+	<string>UTxBEz3rJ6WuSEjoRtDHvScMMB+bIBq9Cry5i1I7v70=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 </dict>

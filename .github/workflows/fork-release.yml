@@ -1,0 +1,48 @@
+name: Fork Release
+
+# Publishes a signed, notarized release of the iTvX/Easydict fork after each
+# merge into dev. It runs only on the fork's self-hosted Mac, whose private
+# runner environment names the local signing keychain, notarytool profile, and
+# Sparkle key; see docs/releases/fork-release.md. Never add pull_request or
+# pull_request_target triggers: this public repository's pull requests must
+# not run code on the self-hosted runner.
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - ".agents/**"
+      - "changelog/**"
+  workflow_dispatch:
+
+concurrency:
+  group: fork-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, notarize and publish
+    if: github.repository == 'iTvX/Easydict' && github.ref == 'refs/heads/dev'
+    runs-on: [self-hosted, macOS, ARM64, easydict-release]
+    timeout-minutes: 120
+    steps:
+      - name: Mask release-Mac paths
+        run: |
+          echo "::add-mask::${HOME}"
+          echo "::add-mask::${RUNNER_WORKSPACE}"
+          echo "::add-mask::${RUNNER_TEMP}"
+
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      # Full logs stay on the release Mac; this public repository's artifacts
+      # must not carry local paths.
+      - name: Build, notarize and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/fork-release/fork-release.sh run
