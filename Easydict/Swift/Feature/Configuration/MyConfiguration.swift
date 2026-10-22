@@ -119,9 +119,6 @@ class MyConfiguration: NSObject {
     // Max window height percentage, e.g., 80 means 80% of the screen height
     @DefaultsWrapper(.maxWindowHeightPercentage) var maxWindowHeightPercentage: Int
 
-    @DefaultsWrapper(.allowCrashLog) var allowCrashLog: Bool
-    @DefaultsWrapper(.allowAnalytics) var allowAnalytics: Bool
-
     @ShortcutWrapper(.pinShortcut) var pinShortcutString: String
     @ShortcutWrapper(.googleShortcut) var googleShortcutString: String
     @ShortcutWrapper(.appleDictionaryShortcut) var appleDictShortcutString: String
@@ -144,7 +141,6 @@ class MyConfiguration: NSObject {
         }
         set {
             updater.automaticallyChecksForUpdates = newValue
-            logSettings(["automatically_checks_for_updates": newValue])
         }
     }
 
@@ -168,53 +164,12 @@ class MyConfiguration: NSObject {
 
     // MARK: Private
 
-    // swiftlint:disable:next function_body_length
     private func observeKeys() {
-        Defaults.publisher(.firstLanguage, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetFirstLanguage()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.secondLanguage, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetSecondLanguage()
-            }
-            .store(in: &cancellables)
-
         Defaults.publisher(.autoShowQueryIcon, options: [])
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.didSetAutoSelectText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoShowQueryIconExcludedLanguage, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoShowQueryIconExcludedLanguage()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoShowQueryIconMinTextLength, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoShowQueryIconMinTextLength()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.enableForceGetSelectedText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetForceAutoGetSelectedText()
             }
             .store(in: &cancellables)
 
@@ -231,86 +186,6 @@ class MyConfiguration: NSObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.didSetHideMainWindow()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoQueryOCRText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoQueryOCRText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoQuerySelectedText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoQuerySelectedText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoQueryPastedText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoQueryPastedText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoPlayAudio, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoPlayAudio()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.pronunciation, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetPronunciation()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoCopySelectedText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoCopySelectedText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoCopyOCRText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoCopyOCRText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.autoCopyFirstTranslatedText, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAutoCopyFirstTranslatedText()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.languageDetectOptimize, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetLanguageDetectOptimize()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.defaultTTSServiceType, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetDefaultTTSServiceType()
             }
             .store(in: &cancellables)
 
@@ -343,62 +218,6 @@ class MyConfiguration: NSObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.didSetShowSettingQuickLink()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.hideMenuBarIcon, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetHideMenuBarIcon()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.fixedWindowPosition, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetFixedWindowPosition()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.mouseSelectTranslateWindowType, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetMouseSelectTranslateWindowType()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.shortcutSelectTranslateWindowType, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetShortcutSelectTranslateWindowType()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.allowCrashLog, options: [.initial])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAllowCrashLog()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.allowAnalytics, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetAllowAnalytics()
-            }
-            .store(in: &cancellables)
-
-        Defaults.publisher(.clearQueryWhenInputTranslate, options: [])
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.didSetClearInput()
             }
             .store(in: &cancellables)
 
@@ -451,39 +270,12 @@ class MyConfiguration: NSObject {
 // MARK: setter
 
 extension MyConfiguration {
-    fileprivate func didSetFirstLanguage() {
-        logSettings(["first_language": firstLanguage])
-    }
-
-    fileprivate func didSetSecondLanguage() {
-        logSettings(["second_language": secondLanguage])
-    }
-
     fileprivate func didSetAutoSelectText() {
         EventMonitor.shared.addBothMonitor(autoSelectText)
-        logSettings(["auto_select_sext": autoSelectText])
-    }
-
-    fileprivate func didSetAutoShowQueryIconExcludedLanguage() {
-        logSettings(["auto_show_query_icon_excluded_language": autoShowQueryIconExcludedLanguage])
-    }
-
-    fileprivate func didSetAutoShowQueryIconMinTextLength() {
-        logSettings(["auto_show_query_icon_min_text_length": autoShowQueryIconMinTextLength])
-    }
-
-    fileprivate func didSetForceAutoGetSelectedText() {
-        logSettings(["force_get_selected_text": enableForceGetSelectedText])
     }
 
     fileprivate func didSetClickQuery() {
         EZWindowManager.shared().updatePopButtonQueryAction()
-
-        logSettings(["click_query": clickQuery])
-    }
-
-    fileprivate func didSetAutomaticallyChecksForUpdates() {
-        logSettings(["automatically_checks_for_updates": automaticallyChecksForUpdates])
     }
 
     fileprivate func didSetHideMainWindow() {
@@ -492,99 +284,22 @@ extension MyConfiguration {
         if hideMainWindow {
             windowManger.destroyMainWindow()
         }
-
-        logSettings(["hide_main_window": hideMainWindow])
-    }
-
-    fileprivate func didSetAutoQueryOCRText() {
-        logSettings(["auto_query_ocr_text": autoQueryOCRText])
-    }
-
-    fileprivate func didSetAutoQuerySelectedText() {
-        logSettings(["auto_query_selected_text": autoQuerySelectedText])
-    }
-
-    fileprivate func didSetAutoQueryPastedText() {
-        logSettings(["auto_query_pasted_text": autoQueryPastedText])
-    }
-
-    fileprivate func didSetAutoPlayAudio() {
-        logSettings(["auto_play_word_audio": autoPlayAudio])
-    }
-
-    fileprivate func didSetPronunciation() {
-        logSettings(["english_pronunciation": pronunciation])
-    }
-
-    fileprivate func didSetAutoCopySelectedText() {
-        logSettings(["auto_copy_selected_text": autoCopySelectedText])
-    }
-
-    fileprivate func didSetAutoCopyOCRText() {
-        logSettings(["auto_copy_ocr_text": autoCopyOCRText])
-    }
-
-    fileprivate func didSetAutoCopyFirstTranslatedText() {
-        logSettings(["auto_copy_first_translated_text": autoCopyFirstTranslatedText])
-    }
-
-    fileprivate func didSetLanguageDetectOptimize() {
-        logSettings(["detect_optimize": languageDetectOptimize])
-    }
-
-    fileprivate func didSetDefaultTTSServiceType() {
-        let value = defaultTTSServiceType
-        logSettings(["tts": value])
     }
 
     fileprivate func didSetShowGoogleQuickLink() {
         postUpdateQuickLinkButtonNotification()
-        logSettings(["show_google_link": showGoogleQuickLink])
     }
 
     fileprivate func didSetShowEudicQuickLink() {
         postUpdateQuickLinkButtonNotification()
-        logSettings(["show_eudic_link": showEudicQuickLink])
     }
 
     fileprivate func didSetShowAppleDictionaryQuickLink() {
         postUpdateQuickLinkButtonNotification()
-        logSettings(["show_apple_dictionary_link": showAppleDictionaryQuickLink])
     }
 
     func didSetShowSettingQuickLink() {
         postUpdateQuickLinkButtonNotification()
-
-        logSettings(["showSettingQuickLink": showQuickActionButton])
-    }
-
-    fileprivate func didSetHideMenuBarIcon() {
-        logSettings(["hide_menu_bar_icon": hideMenuBarIcon])
-    }
-
-    fileprivate func didSetFixedWindowPosition() {
-        logSettings(["show_fixed_window_position": fixedWindowPosition])
-    }
-
-    fileprivate func didSetMouseSelectTranslateWindowType() {
-        logSettings(["show_mouse_window_type": mouseSelectTranslateWindowType])
-    }
-
-    fileprivate func didSetShortcutSelectTranslateWindowType() {
-        logSettings(["show_shortcut_window_type": shortcutSelectTranslateWindowType])
-    }
-
-    fileprivate func didSetAllowCrashLog() {
-        AnalyticsService.setCrashEnabled(allowCrashLog)
-        logSettings(["allow_crash_log": allowCrashLog])
-    }
-
-    fileprivate func didSetAllowAnalytics() {
-        logSettings(["allow_analytics": allowAnalytics])
-    }
-
-    fileprivate func didSetClearInput() {
-        logSettings(["clear_input": clearInput])
     }
 
     fileprivate func didSetFontSizeIndex() {
@@ -600,9 +315,5 @@ extension MyConfiguration {
     fileprivate func postUpdateQuickLinkButtonNotification() {
         let notification = Notification(name: Notification.Name.linkButtonUpdated, object: nil)
         NotificationCenter.default.post(notification)
-    }
-
-    fileprivate func logSettings(_ parameters: [String: Any]) {
-        AnalyticsService.logEvent(withName: "settings", parameters: parameters)
     }
 }

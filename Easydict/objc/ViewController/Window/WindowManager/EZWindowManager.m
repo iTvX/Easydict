@@ -378,9 +378,6 @@ static EZWindowManager *_instance;
         return;
     }
 
-    // Log selected text when querying.
-    [self logSelectedTextEvent];
-
     void (^updateQueryTextAndStartQueryBlock)(BOOL) = ^(BOOL needFocus) {
         // Update input text and detect.
         [queryViewController updateQueryTextAndParagraphStyle:queryText actionType:self.actionType];
@@ -1118,38 +1115,6 @@ static EZWindowManager *_instance;
         }
     }
     return NO;
-}
-
-- (void)logSelectedTextEvent {
-    NSString *text = self.selectedText;
-
-    if (!text) {
-        return;
-    }
-
-    NSRunningApplication *application = self.eventMonitor.frontmostApplication;
-    NSString *appName = application.localizedName ?: @"";
-    NSString *bundleID = application.bundleIdentifier ?: @"";
-    NSString *textLength = [EZAnalyticsService textLengthRange:text];
-    NSString *triggerType = [EZEnumTypes stringValueOfTriggerType:self.eventMonitor.triggerType];
-
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:@{
-        @"actionType" : self.actionType,
-        @"selectTextType" : self.eventMonitor.selectTextType,
-        @"triggerType" : triggerType,
-        @"textLength" : textLength,
-        @"appName" : appName,
-        @"bundleID" : bundleID,
-    }];
-
-    NSString *browserTabURLString = self.eventMonitor.browserTabURLString;
-    if (browserTabURLString.length) {
-        NSURL *tabURL = [NSURL URLWithString:browserTabURLString];
-        NSString *host = tabURL.host ?: browserTabURLString;
-        dict[@"host"] = host;
-    }
-
-    [EZAnalyticsService logEventWithName:@"getSelectedText" parameters:dict];
 }
 
 @end

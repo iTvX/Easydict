@@ -70,36 +70,6 @@ NSString *const EZDefaultTTSServiceKey = @"EZDefaultTTSServiceKey";
 
 @implementation EZEnumTypes
 
-+ (NSString *)stringValueOfTriggerType:(EZTriggerType)triggerType {
-    switch (triggerType) {
-        case EZTriggerTypeNone:
-            return @"none";
-        case EZTriggerTypeDoubleClick:
-            return @"double_click";
-        case EZTriggerTypeTripleClick:
-            return @"triple_click";
-        case EZTriggerTypeDragged:
-            return @"dragged";
-        case EZTriggerTypeShift:
-            return @"shift";
-        case EZTriggerTypeSelectAllShortcut:
-            return @"select_all_shortcut";
-    }
-}
-
-+ (NSString *)windowName:(EZWindowType)type {
-    switch (type) {
-        case EZWindowTypeMain:
-            return @"main_window";
-        case EZWindowTypeFixed:
-            return @"fixed_window";
-        case EZWindowTypeMini:
-            return @"mini_window";
-        default:
-            return @"none_window";
-    }
-}
-
 + (MMOrderedDictionary *)fixedWindowPositionDict {
     MMOrderedDictionary *dict = [[MMOrderedDictionary alloc] initWithKeysAndObjects:
                                                                  @(EZShowWindowPositionRight), NSLocalizedString(@"fixed_window_position_right", nil),

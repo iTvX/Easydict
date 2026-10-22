@@ -388,7 +388,6 @@
 		03D0F0112F00000100ABCDEF /* QueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D0F0012F00000100ABCDEF /* QueryService.swift */; };
 		03D0F0122F00000100ABCDEF /* BaiduService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D0F0022F00000100ABCDEF /* BaiduService.swift */; };
 		03D0F0132F00000200ABCDEF /* QueryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D0F0032F00000200ABCDEF /* QueryResult.swift */; };
-		03D1C8782952B1CD00F2C7BD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03D1C8772952B1CD00F2C7BD /* GoogleService-Info.plist */; };
 		03D35DAA2AA6C49B00B023FE /* NSString+EZRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 03D35DA92AA6C49B00B023FE /* NSString+EZRegex.m */; };
 		03D486502E3F2021009313B3 /* Regex+List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D4864F2E3F2021009313B3 /* Regex+List.swift */; };
 		03D486532E3F2190009313B3 /* ListRegexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D486522E3F2190009313B3 /* ListRegexTests.swift */; };
@@ -486,7 +485,6 @@
 		24D3321DBBE84C798A32C595 /* ClaudeCodeServiceConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F42ADC9AAB3494D9E85B5D8 /* ClaudeCodeServiceConfigurationView.swift */; };
 		2721E4D02AFE920700A059AC /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 2721E4CF2AFE920700A059AC /* Alamofire */; };
 		2746AEC12AF95138005FE0A1 /* CaiyunService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2746AEC02AF95138005FE0A1 /* CaiyunService.swift */; };
-		276742082B3DC230002A2C75 /* PrivacyTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276742042B3DC230002A2C75 /* PrivacyTab.swift */; };
 		276742092B3DC230002A2C75 /* AboutTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276742052B3DC230002A2C75 /* AboutTab.swift */; };
 		278322602B0FB0EA0026644C /* CaiyunResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2783225F2B0FB0EA0026644C /* CaiyunResponse.swift */; };
 		278322622B0FB8EF0026644C /* CaiyunTranslateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278322612B0FB8EF0026644C /* CaiyunTranslateType.swift */; };
@@ -511,7 +509,6 @@
 		59F60C73B7C74FC8820E138E /* SystemUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8033C170F2954D79899C1339 /* SystemUtilitiesTests.swift */; };
 		5A3A753C59BD5443FA91764C /* Pods_EasydictTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 378E73A7EA8FC8FB9C975A63 /* Pods_EasydictTests.framework */; };
 		5BA419F2EF852376A925D849 /* CodexManagedTranslationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5448A25311DF3B636D9045C9 /* CodexManagedTranslationTests.swift */; };
-		5C5B3D6F80CB486E9D615E07 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 8FA77A6C61B54C27803F5D7D /* Sentry */; };
 		5DA8E7A2234D4AFDBC264218 /* MDictManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FFFD863EBF442CB4FCE765 /* MDictManager.swift */; };
 		5F8B9C012F1D4E5A9C730401 /* MDictSearchIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8B9C002F1D4E5A9C730401 /* MDictSearchIndex.swift */; };
 		62E2BF4A2B4082BA00E42D38 /* AliService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62E2BF472B4082BA00E42D38 /* AliService.swift */; };
@@ -539,7 +536,6 @@
 		8049F36A2F0376B000DD454F /* NSImage+ImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8049F3662F0376B000DD454F /* NSImage+ImageFormat.swift */; };
 		8049F36B2F0376B000DD454F /* NSImage+Export.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8049F3642F0376B000DD454F /* NSImage+Export.swift */; };
 		8049F36C2F0376B000DD454F /* NSImage+RoundedCorner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8049F3672F0376B000DD454F /* NSImage+RoundedCorner.swift */; };
-		860409132DDD5F090095781D /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 860409122DDD5F090095781D /* FirebaseAnalytics */; };
 		894B8BB72D5D98A3004B36C1 /* PronunciationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894B8BB62D5D989A004B36C1 /* PronunciationExtensions.swift */; };
 		8ECC69B8B5326B2884D3B877 /* CodexManagedAccountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A451FB8A81E2EB6077744D /* CodexManagedAccountTests.swift */; };
 		8FA639CB01DB48FFB856FAF6 /* GitHubCopilotModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D62DA53787E49EC9011BB14 /* GitHubCopilotModelStore.swift */; };
@@ -566,7 +562,6 @@
 		A1C1A10430ABCDEF00112233 /* ClaudeSSEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1A10330ABCDEF00112233 /* ClaudeSSEParser.swift */; };
 		A1D1807B2F8D100100B1C0D1 /* ThrottleGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1807A2F8D100100B1C0D1 /* ThrottleGate.swift */; };
 		A1D1807E2F8D100100B1C0D1 /* ThrottleGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D1807D2F8D100100B1C0D1 /* ThrottleGateTests.swift */; };
-		A2016EDA90ED45B5B66FA986 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14921B68C1D645268F93668E /* AnalyticsService.swift */; };
 		A20908010000000000000001 /* OpenAIStreamTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20908010000000000000002 /* OpenAIStreamTransport.swift */; };
 		A20908020000000000000004 /* OpenAIStreamTaskControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20908020000000000000014 /* OpenAIStreamTaskControlTests.swift */; };
 		A3963A91D1E14EA7A29881E1 /* GitHubCopilotServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BDD519F8FC435085E73F8F /* GitHubCopilotServiceTests.swift */; };
@@ -1164,7 +1159,6 @@
 		03D0F0012F00000100ABCDEF /* QueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryService.swift; sourceTree = "<group>"; };
 		03D0F0022F00000100ABCDEF /* BaiduService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaiduService.swift; sourceTree = "<group>"; };
 		03D0F0032F00000200ABCDEF /* QueryResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryResult.swift; sourceTree = "<group>"; };
-		03D1C8772952B1CD00F2C7BD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		03D35DA82AA6C49B00B023FE /* NSString+EZRegex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+EZRegex.h"; sourceTree = "<group>"; };
 		03D35DA92AA6C49B00B023FE /* NSString+EZRegex.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+EZRegex.m"; sourceTree = "<group>"; };
 		03D4864F2E3F2021009313B3 /* Regex+List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Regex+List.swift"; sourceTree = "<group>"; };
@@ -1257,7 +1251,6 @@
 		0DEEFE010002000000000015 /* ReasoningEffort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReasoningEffort.swift; sourceTree = "<group>"; };
 		0E05FAE652054152B23EB28E /* ClaudeCodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeService.swift; sourceTree = "<group>"; };
 		13DB7B7B4B9BCB76E7824231 /* CodexManagedRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexManagedRuntime.swift; sourceTree = "<group>"; };
-		14921B68C1D645268F93668E /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		223DDDB5B2984382B5744C3C /* ClaudeCodeRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeRunner.swift; sourceTree = "<group>"; };
 		22A43B01567C41CA8CF4109B /* ClaudeCodeEffort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeEffort.swift; sourceTree = "<group>"; };
 		23C50DB027FC5F26D2AED298 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -1265,7 +1258,6 @@
 		26A451FB8A81E2EB6077744D /* CodexManagedAccountTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexManagedAccountTests.swift; sourceTree = "<group>"; };
 		26FFFD863EBF442CB4FCE765 /* MDictManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDictManager.swift; sourceTree = "<group>"; };
 		2746AEC02AF95138005FE0A1 /* CaiyunService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiyunService.swift; sourceTree = "<group>"; };
-		276742042B3DC230002A2C75 /* PrivacyTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyTab.swift; sourceTree = "<group>"; };
 		276742052B3DC230002A2C75 /* AboutTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTab.swift; sourceTree = "<group>"; };
 		2783225F2B0FB0EA0026644C /* CaiyunResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiyunResponse.swift; sourceTree = "<group>"; };
 		278322612B0FB8EF0026644C /* CaiyunTranslateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiyunTranslateType.swift; sourceTree = "<group>"; };
@@ -1488,8 +1480,6 @@
 				038030972B4106800009230C /* CocoaLumberjackSwift in Frameworks */,
 				038EA1AA2B41169C008A6DD1 /* ZipArchive in Frameworks */,
 				03E534BC2CE0D38C00B37264 /* AcknowList in Frameworks */,
-				860409132DDD5F090095781D /* FirebaseAnalytics in Frameworks */,
-				5C5B3D6F80CB486E9D615E07 /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1565,7 +1555,6 @@
 				0A057D7F2F7000000025C51D /* AdvancedTabAnkiSection.swift */,
 				0B6CC260EE5345A88A8DB738 /* SheetChevronRow.swift */,
 				71E61BD21DF447CDB6B01D74 /* AnkiConnectSettingsView.swift */,
-				276742042B3DC230002A2C75 /* PrivacyTab.swift */,
 				276742052B3DC230002A2C75 /* AboutTab.swift */,
 			);
 			path = TabView;
@@ -2104,7 +2093,6 @@
 			children = (
 				27FE95262B3DC55F000AD654 /* EasydictApp.swift */,
 				031DBD782AE01E130071CF85 /* easydict */,
-				03D1C8772952B1CD00F2C7BD /* GoogleService-Info.plist */,
 				C4DE3D6C2AC00EB500C2B85D /* Localizable.xcstrings */,
 				C477BF902C0E2C61006A3F27 /* InfoPlist.xcstrings */,
 				03BFBB5429235C9400C48725 /* Icons */,
@@ -3497,14 +3485,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		5A735120BF914C709B1E6B2B /* Logging */ = {
-			isa = PBXGroup;
-			children = (
-				14921B68C1D645268F93668E /* AnalyticsService.swift */,
-			);
-			path = Logging;
-			sourceTree = "<group>";
-		};
 		5AE858D044C24CD68D5B4DDA /* Claude */ = {
 			isa = PBXGroup;
 			children = (
@@ -3868,7 +3848,6 @@
 				03F2D02F2F0FE6D600A99FC0 /* EventMonitor */,
 				03CA1CF02EDE089E001908D0 /* Appearance */,
 				03BBC8142E62049600CFC582 /* SystemUtility */,
-				5A735120BF914C709B1E6B2B /* Logging */,
 				1720B06B4E14473BB7EB192B /* DeviceInfo */,
 				03F2815B2D98E52200AE518C /* ChineseGenre */,
 				EAE3D34F2B62E9DE001EE3E3 /* GlobalContext.swift */,
@@ -4012,7 +3991,6 @@
 				C0DEC1340000000000000001 /* Prepare bundled Codex */,
 				124D690EE7236D6430CF945E /* [CP] Embed Pods Frameworks */,
 				C98CAE74239F45DA005F7DCA /* CopyFiles */,
-				0A10B7439899441180660AF2 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -4040,8 +4018,6 @@
 				03A173E62CD120E600791B51 /* SelectedTextKit */,
 				03E534BB2CE0D38C00B37264 /* AcknowList */,
 				0354E91F2D3601500050E5BE /* AsyncAlgorithms */,
-				8FA77A6C61B54C27803F5D7D /* Sentry */,
-				860409122DDD5F090095781D /* FirebaseAnalytics */,
 				0322D74B2EDC1C72005E67D8 /* OmenTextField */,
 			);
 			productName = Bob;
@@ -4089,7 +4065,6 @@
 				03022F1A2B35DEBA00B63209 /* XCRemoteSwiftPackageReference "Hue" */,
 				03022F202B36D1A300B63209 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				03A8308B2B405F8E00112834 /* XCRemoteSwiftPackageReference "Sparkle" */,
-				03A830932B4076FC00112834 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				038030932B4106800009230C /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
 				038EA1A82B41169C008A6DD1 /* XCRemoteSwiftPackageReference "ZipArchive" */,
 				038EA1AB2B41282F008A6DD1 /* XCRemoteSwiftPackageReference "MJExtension" */,
@@ -4104,7 +4079,6 @@
 				03A173E52CD120E600791B51 /* XCRemoteSwiftPackageReference "SelectedTextKit" */,
 				03E534BA2CE0D38C00B37264 /* XCRemoteSwiftPackageReference "AcknowList" */,
 				0354E91E2D3601500050E5BE /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				61CCBB09A2214ECE9FB1ECFD /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				03DD46182EDB38D1009E5D7B /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				0322D74A2EDC1C72005E67D8 /* XCRemoteSwiftPackageReference "OmenTextField" */,
 			);
@@ -4226,7 +4200,6 @@
 				030D612C2CD9BB34000DF298 /* Pods-Easydict-acknowledgements.plist in Resources */,
 				CA9CF8A52D2E6D13000C1860 /* 美_v4.json in Resources */,
 				03B022E629231FA6001C7E63 /* Assets.xcassets in Resources */,
-				03D1C8782952B1CD00F2C7BD /* GoogleService-Info.plist in Resources */,
 				C4DE3D6D2AC00EB500C2B85D /* Localizable.xcstrings in Resources */,
 				CA9CF8A32D2E6CE6000C1860 /* good_v4.json in Resources */,
 				03BFBB662923998300C48725 /* black-white-icon@3x.png in Resources */,
@@ -4257,24 +4230,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/bash\n# Easydict SwiftFormat Script\n\nset -e\n\n#Docs https://github.com/nicklockwood/SwiftFormat#using-swift-package-manager\n\nif [ \"${EASYDICT_RELEASE_PACKAGING}\" = \"YES\" ]; then\n  echo \"SwiftFormat skipped for Easydict release packaging.\"\n  exit 0;\nfi\n\nif [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"SwiftFormat skipped for Xcode Previews.\"\n  exit 0;\nfi\n# \"${PODS_ROOT}/SwiftFormat/CommandLineTool/swiftformat\" \"$SRCROOT\"\n\ncd BuildTools\nSDKROOT=(xcrun --sdk macosx --show-sdk-path)\n#swift package update #Uncomment this line temporarily to update the version used to the latest matching your BuildTools/Package.swift file\nswift run -c release swiftformat \"$SRCROOT\"\n";
-		};
-		0A10B7439899441180660AF2 /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-			);
-			name = "Upload Debug Symbols to Sentry";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/sentry-upload-debug-symbols.log",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script uploads debug symbols and source context to Sentry.\n\nLOG_FILE=\"${SCRIPT_OUTPUT_FILE_0:-$BUILT_PRODUCTS_DIR/sentry-upload-debug-symbols.log}\"\n: > \"$LOG_FILE\"\n\nlog_message() {\n    printf '%s\\n' \"$1\"\n    printf '%s\\n' \"$1\" >> \"$LOG_FILE\"\n}\n\nappend_log() {\n    printf '%s\\n' \"$1\" >> \"$LOG_FILE\"\n}\n\nif [ \"$(uname -m)\" = \"arm64\" ]; then\n    PATH=\"/opt/homebrew/bin:$PATH\"\n    export PATH\nfi\n\n# Only run this script in Release configuration.\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n    log_message \"Skipping Sentry debug symbol upload for $CONFIGURATION configuration.\"\n    exit 0\nfi\n\nif ! command -v sentry-cli >/dev/null 2>&1; then\n    log_message \"warning: sentry-cli not found. Skipping Sentry debug symbol upload.\"\n    exit 0\nfi\n\nexport SENTRY_ORG=izual\nexport SENTRY_PROJECT=easydict\n\nSENTRY_CONFIG_FILE=\"$PROJECT_DIR/.sentryclirc\"\nif [ -z \"$SENTRY_AUTH_TOKEN\" ] && [ ! -f \"$SENTRY_CONFIG_FILE\" ]; then\n    log_message \"warning: Release mode - SENTRY_AUTH_TOKEN is not set and $SENTRY_CONFIG_FILE was not found. Skipping Sentry debug symbol upload.\"\n    exit 0\nfi\n\nAPP_DSYM_PATH=\"$DWARF_DSYM_FOLDER_PATH/$DWARF_DSYM_FILE_NAME\"\nif [ ! -d \"$APP_DSYM_PATH\" ]; then\n    log_message \"warning: App dSYM not found at $APP_DSYM_PATH. Skipping Sentry debug symbol upload.\"\n    exit 0\nfi\n\nattempt=1\nmax_attempts=3\nUPLOAD_STATUS=1\nwhile [ $attempt -le $max_attempts ]; do\n    append_log \"sentry-cli upload attempt $attempt/$max_attempts for $APP_DSYM_PATH\"\n    UPLOAD_OUTPUT=$(sentry-cli debug-files upload --include-sources \"$APP_DSYM_PATH\" 2>&1)\n    UPLOAD_STATUS=$?\n    if [ -n \"$UPLOAD_OUTPUT\" ]; then\n        append_log \"$UPLOAD_OUTPUT\"\n    fi\n    if [ $UPLOAD_STATUS -eq 0 ]; then\n        break\n    fi\n    attempt=$((attempt + 1))\n    if [ $attempt -le $max_attempts ]; then\n        sleep 2\n    fi\ndone\n\nif [ $UPLOAD_STATUS -ne 0 ]; then\n    log_message \"warning: Sentry debug symbol upload failed after $max_attempts attempts. See $LOG_FILE for details.\"\n    exit 0\nfi\n\nlog_message \"Uploaded debug symbols to Sentry from $APP_DSYM_PATH.\"\n";
 		};
 		124D690EE7236D6430CF945E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4607,7 +4562,6 @@
 				27FE95272B3DC55F000AD654 /* EasydictApp.swift in Sources */,
 				03882F9129D95044005B5A52 /* CTCommon.m in Sources */,
 				032AAA5D2C45744E007996A1 /* VaporServer.swift in Sources */,
-				276742082B3DC230002A2C75 /* PrivacyTab.swift in Sources */,
 				035451052E3C656A00BAA8E5 /* OCRMergeAnalyzer.swift in Sources */,
 				0AC11B242B4E46B300F07198 /* TapHandlerView.swift in Sources */,
 				03882F8F29D95044005B5A52 /* CTScreen.m in Sources */,
@@ -4894,7 +4848,6 @@
 				03F2F08D2E4074FF00496F71 /* CharacterSet+Extension.swift in Sources */,
 				035179182EF301C20054C985 /* AppTriggerConfig.swift in Sources */,
 				0A9AFBAB2B7F8D7E0064C9A8 /* CustomOpenAIService.swift in Sources */,
-				A2016EDA90ED45B5B66FA986 /* AnalyticsService.swift in Sources */,
 				034E309A2E17809C0079E371 /* OCRTextProcessor.swift in Sources */,
 				03BDA7C02A26DA280079D04F /* XPMArgumentPackage.m in Sources */,
 				039223BC2E4B41950052F695 /* OCRDebugView.swift in Sources */,
@@ -5371,14 +5324,6 @@
 				minimumVersion = 2.6.4;
 			};
 		};
-		03A830932B4076FC00112834 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.13.0;
-			};
-		};
 		03DD46182EDB38D1009E5D7B /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -5417,14 +5362,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.12.0;
-			};
-		};
-		61CCBB09A2214ECE9FB1ECFD /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/getsentry/sentry-cocoa/";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.44.0;
 			};
 		};
 		967712E82B5B913600105E0F /* XCRemoteSwiftPackageReference "KeyHolder" */ = {
@@ -5543,16 +5480,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2721E4CE2AFE920700A059AC /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
-		};
-		860409122DDD5F090095781D /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03A830932B4076FC00112834 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		8FA77A6C61B54C27803F5D7D /* Sentry */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 61CCBB09A2214ECE9FB1ECFD /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
-			productName = Sentry;
 		};
 		967712E92B5B913600105E0F /* KeyHolder */ = {
 			isa = XCSwiftPackageProductDependency;
