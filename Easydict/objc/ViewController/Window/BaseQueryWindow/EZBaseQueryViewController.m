@@ -29,6 +29,8 @@ static NSString *const EZResultViewId = @"EZResultViewId";
 static NSString *const EZColumnId = @"EZColumnId";
 static NSTimeInterval const EZWindowHeightCoalescingInterval = 0.08;
 static NSTimeInterval const EZWindowHeightAnimationDuration = 0.18;
+/// Minimum interval between result relayouts while the user drags the window edge.
+static NSTimeInterval const EZLiveResizeRelayoutInterval = 0.1;
 
 static NSString *const kDCSActiveDictionariesChangedDistributedNotification = @"kDCSActiveDictionariesChangedDistributedNotification";
 
@@ -78,6 +80,7 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
 @property (nonatomic, assign) BOOL needsWindowHeightUpdate;
 @property (nonatomic, assign) BOOL isUpdatingRowHeights;
 @property (nonatomic, assign) CGFloat lastLayoutWidth;
+@property (nonatomic, assign) BOOL liveResizeRelayoutScheduled;
 
 @property (nonatomic, assign) BOOL isInputFieldCellVisible;
 @property (nonatomic, assign) BOOL isSelectLanguageCellVisible;
@@ -162,28 +165,15 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
             return;
         }
 
-        CGFloat width = self.scrollView.contentSize.width;
-        if (fabs(width - self.lastLayoutWidth) < EZLayoutGeometryTolerance_0_5) {
+        // Reloading rebuilds every result view and re-measures its text, which is far too slow to
+        // repeat on every frame of a live resize. Reflow at most once per interval while the user
+        // drags, and once more when the drag ends.
+        if (self.view.window.inLiveResize) {
+            [self scheduleLiveResizeRelayout];
             return;
         }
-        self.lastLayoutWidth = width;
 
-        [self setNeedUpdateIframeHeightForAllResults];
-
-        [self reloadTableViewDataWithoutWindowHeightUpdate:^{
-            // Update query view height manually, and update cell height.
-            CGFloat queryViewHeight = [self.queryView heightOfQueryView];
-            if (queryViewHeight) {
-                self.queryModel.queryViewHeight = queryViewHeight;
-
-                if (self.isInputFieldCellVisible) {
-                    NSIndexSet *firstIndexSet = [NSIndexSet indexSetWithIndex:0];
-                    [self updateRowHeightsWithoutAnimation:firstIndexSet];
-                }
-            }
-
-            [self updateWindowHeight];
-        }];
+        [self relayoutResultsForCurrentWidth];
     }];
 
 
@@ -229,6 +219,12 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
     [defaultCenter addObserver:self
                       selector:@selector(updateWindowHeight)
                           name:NSNotification.maxWindowHeightSettingsChanged
+                        object:nil];
+
+    // The window may not exist yet, so filter by window in the handler.
+    [defaultCenter addObserver:self
+                      selector:@selector(handleWindowDidEndLiveResize:)
+                          name:NSWindowDidEndLiveResizeNotification
                         object:nil];
 }
 
@@ -333,6 +329,68 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
     // TODO: need to optimize. Manually update the cell height, because the reused cell will not self-adjust the height.
     //    [self updateAllResultCellHeightIfNeed];
     [self updateTableViewHeight];
+}
+
+#pragma mark - Live Resize
+
+/// Relayout results for the current content width when it differs from the last laid-out width.
+- (void)relayoutResultsForCurrentWidth {
+    if (self.isUpdatingWindowFrameInternally) {
+        return;
+    }
+
+    CGFloat width = self.scrollView.contentSize.width;
+    if (fabs(width - self.lastLayoutWidth) < EZLayoutGeometryTolerance_0_5) {
+        return;
+    }
+    self.lastLayoutWidth = width;
+
+    [self setNeedUpdateIframeHeightForAllResults];
+
+    [self reloadTableViewDataWithoutWindowHeightUpdate:^{
+        // Update query view height manually, and update cell height.
+        CGFloat queryViewHeight = [self.queryView heightOfQueryView];
+        if (queryViewHeight) {
+            self.queryModel.queryViewHeight = queryViewHeight;
+
+            if (self.isInputFieldCellVisible) {
+                NSIndexSet *firstIndexSet = [NSIndexSet indexSetWithIndex:0];
+                [self updateRowHeightsWithoutAnimation:firstIndexSet];
+            }
+        }
+
+        [self updateWindowHeight];
+    }];
+}
+
+/// Coalesce live-resize relayouts into at most one per `EZLiveResizeRelayoutInterval`.
+- (void)scheduleLiveResizeRelayout {
+    if (self.liveResizeRelayoutScheduled) {
+        return;
+    }
+    self.liveResizeRelayoutScheduled = YES;
+
+    mm_weakify(self);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(EZLiveResizeRelayoutInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        mm_strongify(self);
+        // The end of the live resize may already have relaid out the results.
+        if (!self.liveResizeRelayoutScheduled) {
+            return;
+        }
+        self.liveResizeRelayoutScheduled = NO;
+        [self relayoutResultsForCurrentWidth];
+    });
+}
+
+- (void)handleWindowDidEndLiveResize:(NSNotification *)notification {
+    if (notification.object != self.view.window) {
+        return;
+    }
+
+    // Always relayout once at the final width, even if a height update recorded it meanwhile.
+    self.liveResizeRelayoutScheduled = NO;
+    self.lastLayoutWidth = -1;
+    [self relayoutResultsForCurrentWidth];
 }
 
 #pragma mark - Getter && Setter
@@ -1869,7 +1927,10 @@ static BOOL ez_frame_equal_with_tolerance(CGRect lhs, CGRect rhs, CGFloat tolera
 
     BOOL animate = allowsAnimation && window.isVisible && !window.inLiveResize &&
         !NSWorkspace.sharedWorkspace.accessibilityDisplayShouldReduceMotion;
-    self.lastLayoutWidth = self.scrollView.contentSize.width;
+    // A pending live-resize relayout means the current width has not been laid out yet.
+    if (!self.liveResizeRelayoutScheduled) {
+        self.lastLayoutWidth = self.scrollView.contentSize.width;
+    }
     self.isUpdatingWindowFrameInternally = YES;
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         context.duration = animate ? EZWindowHeightAnimationDuration : 0;
