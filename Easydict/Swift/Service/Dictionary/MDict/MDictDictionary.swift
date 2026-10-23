@@ -8,7 +8,8 @@
 
 import Foundation
 
-private let maxMDictCachedDataURIBytes = 32 * 1024 * 1024
+/// Cached data URIs still count against the per-lookup budget, so this limit only trades hit rate for memory.
+private let maxMDictCachedDataURIBytes = 8 * 1024 * 1024
 private let maxMDictCachedSingleDataURIBytes = 8 * 1024 * 1024
 private let maxMDictResolvedDataURIBytesPerLookup = 1536 * 1024
 private let maxMDictResolvedDataURICountPerLookup = 96

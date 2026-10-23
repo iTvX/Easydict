@@ -134,7 +134,11 @@ public class AppleOCREngine: NSObject {
             throw QueryError.error(type: .parameter, message: "Invalid image provided for OCR")
         }
 
+        #if DEBUG
+        // Diagnostic copy of the OCR input. Encoding a full-screen capture as PNG costs two more
+        // full-size buffers and a disk write per OCR, so release builds skip it.
         image.write(to: OCRConstants.snipImageFileURL, using: .png)
+        #endif
 
         // Convert NSImage to CGImage
         guard let cgImage = image.toCGImage() else {

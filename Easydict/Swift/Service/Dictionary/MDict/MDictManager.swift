@@ -113,6 +113,10 @@ final class MDictManager: ObservableObject {
     func setEnabled(_ enabled: Bool, for record: MDictDictionaryRecord) {
         guard let idx = records.firstIndex(where: { $0.id == record.id }) else { return }
         records[idx].enabled = enabled
+        if !enabled {
+            // Release readers and caches; lookups reload enabled dictionaries on demand.
+            loadedDictionaries.removeAll { $0.mdxURL.path == record.mdxPath }
+        }
         persist()
     }
 
@@ -280,7 +284,9 @@ final class MDictManager: ObservableObject {
         let replacementPaths = Set(dictionaries.map(\.mdxURL.path)).union(errors.keys)
         loadedDictionaries.removeAll { replacementPaths.contains($0.mdxURL.path) }
         for path in replacementPaths { loadErrors.removeValue(forKey: path) }
-        loadedDictionaries.append(contentsOf: dictionaries)
+        // Drop dictionaries disabled or removed while loading so their caches are not retained.
+        let enabledPaths = Set(records.filter(\.enabled).map(\.mdxPath))
+        loadedDictionaries.append(contentsOf: dictionaries.filter { enabledPaths.contains($0.mdxURL.path) })
         loadErrors.merge(errors) { _, new in new }
     }
 

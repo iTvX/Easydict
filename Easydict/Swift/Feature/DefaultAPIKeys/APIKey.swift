@@ -61,7 +61,17 @@ enum APIKey: String {
 
 @objcMembers
 class SecretKeyManager: NSObject {
-    static var keyValues: [String: String] {
+    // MARK: Internal
+
+    /// Decrypted built-in key values, loaded lazily on first access.
+    ///
+    /// The bundled plist never changes at runtime, so it is read and decrypted once
+    /// instead of on every access. `static let` initialization is thread-safe.
+    static let keyValues: [String: String] = loadKeyValues()
+
+    // MARK: Private
+
+    private static func loadKeyValues() -> [String: String] {
         guard let path = Bundle.main.path(forResource: "EncryptedSecretKeys", ofType: "plist") else {
             return [:]
         }

@@ -6,14 +6,34 @@
 //  Copyright © 2025 izual. All rights reserved.
 //
 
+import AppKit
 import Defaults
 import Foundation
 
 // MARK: - QueryRecordManager
 
 /// Manages query record operations for favorites and history.
+///
+/// Records are kept in memory after the first load and written to defaults on a background
+/// queue, so each query avoids decoding and re-encoding the whole history on the main thread.
 @objc
 class QueryRecordManager: NSObject {
+    // MARK: Lifecycle
+
+    override init() {
+        super.init()
+
+        // `queue: nil` delivers synchronously on the posting (main) thread, so queued writes
+        // are saved before the process exits.
+        self.terminationObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            self?.flush()
+        }
+    }
+
     // MARK: Internal
 
     /// Defines the record category stored in defaults.
@@ -158,27 +178,103 @@ class QueryRecordManager: NSObject {
         loadRecords(for: type).contains { $0.queryText == queryText }
     }
 
+    /// Blocks until all queued record writes have been saved to defaults.
+    ///
+    /// Runs automatically when the app terminates.
+    func flush() {
+        persistQueue.sync {}
+    }
+
+    /// Drops the in-memory records and any unsaved writes, so the next access reloads from defaults.
+    ///
+    /// Call after the stored records change outside this manager, such as a full defaults reset.
+    func discardCachedRecords() {
+        lock.withLock {
+            cachedRecords.removeAll()
+            pendingTypes.removeAll()
+        }
+    }
+
     // MARK: Private
 
     /// Maximum number of history records to keep.
     private static let maxHistoryCount = 1000
 
+    /// Guards `cachedRecords` and `pendingTypes`, which are shared with `persistQueue`.
+    private let lock = NSLock()
+
+    /// Serializes defaults writes off the main thread.
+    private let persistQueue = DispatchQueue(label: "com.izual.Easydict.query-record-manager", qos: .utility)
+
+    /// In-memory records per type, loaded from defaults on first access.
+    private var cachedRecords: [RecordType: [QueryRecord]] = [:]
+
+    /// Types whose in-memory records have a queued, not yet started, write.
+    private var pendingTypes = Set<RecordType>()
+
+    private var terminationObserver: NSObjectProtocol?
+
     /// Returns all records stored for the specified type.
     private func loadRecords(for type: RecordType) -> [QueryRecord] {
-        Defaults[type.storageKey]
+        lock.withLock { cachedRecordsLocked(for: type) }
     }
 
     /// Saves the records for the specified type.
     private func saveRecords(_ records: [QueryRecord], for type: RecordType) {
-        Defaults[type.storageKey] = records
+        lock.withLock { cachedRecords[type] = records }
+        schedulePersist(for: type)
     }
 
     /// Updates records for the specified type and saves when modified.
     private func updateRecords(for type: RecordType, mutate: (inout [QueryRecord]) -> Bool) {
-        var records = loadRecords(for: type)
-        let didChange = mutate(&records)
+        let didChange: Bool = lock.withLock {
+            var records = cachedRecordsLocked(for: type)
+            guard mutate(&records) else {
+                return false
+            }
+            cachedRecords[type] = records
+            return true
+        }
         if didChange {
-            saveRecords(records, for: type)
+            schedulePersist(for: type)
+        }
+    }
+
+    /// Returns the in-memory records, loading them from defaults on first access. Caller must hold `lock`.
+    private func cachedRecordsLocked(for type: RecordType) -> [QueryRecord] {
+        if let records = cachedRecords[type] {
+            return records
+        }
+        let records = Defaults[type.storageKey]
+        cachedRecords[type] = records
+        return records
+    }
+
+    /// Queues a defaults write for the specified type, coalescing changes made before it runs.
+    private func schedulePersist(for type: RecordType) {
+        let isNewRequest = lock.withLock { pendingTypes.insert(type).inserted }
+        guard isNewRequest else {
+            return
+        }
+        // The app supports sudden termination, which skips `willTerminate`; keep the process
+        // alive until the queued write lands.
+        ProcessInfo.processInfo.disableSuddenTermination()
+        persistQueue.async { [weak self] in
+            self?.persistPendingRecords(for: type)
+            ProcessInfo.processInfo.enableSuddenTermination()
+        }
+    }
+
+    /// Writes the latest in-memory records for the specified type. Runs on `persistQueue`.
+    private func persistPendingRecords(for type: RecordType) {
+        let records: [QueryRecord]? = lock.withLock {
+            guard pendingTypes.remove(type) != nil else {
+                return nil
+            }
+            return cachedRecords[type]
+        }
+        if let records {
+            Defaults[type.storageKey] = records
         }
     }
 

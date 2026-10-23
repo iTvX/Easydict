@@ -17,6 +17,15 @@ static NSString *const kFileExtendedAttributes = @"NSFileExtendedAttributes";
 // kMDItemWhereFroms
 static NSString *const kItemWhereFroms = @"com.apple.metadata:kMDItemWhereFroms";
 
+// Trim the audio cache once it exceeds the max size, down to the target size to avoid trimming on every pass.
+static unsigned long long const kAudioCacheMaxSize = 100 * 1024 * 1024;
+static unsigned long long const kAudioCacheTrimTargetSize = 80 * 1024 * 1024;
+// Minimum interval between audio cache size checks, so a check does not run on every play.
+static NSTimeInterval const kAudioCacheTrimInterval = 24 * 60 * 60;
+
+// Last audio cache check time, only accessed on the audio cache trim queue.
+static CFAbsoluteTime sLastAudioCacheTrimTime = 0;
+
 @interface EZAudioPlayer () <NSSpeechSynthesizerDelegate>
 
 @property (nonatomic, strong) EZAppleService *appleService;
@@ -574,6 +583,7 @@ static NSString *const kItemWhereFroms = @"com.apple.metadata:kMDItemWhereFroms"
     if (![[NSFileManager defaultManager] fileExistsAtPath:audioDirectory]) {
         [[NSFileManager defaultManager] createDirectoryAtPath:audioDirectory withIntermediateDirectories:YES attributes:nil error:nil];
     }
+    [EZAudioPlayer trimAudioCacheIfNeededAtDirectory:audioDirectory];
     return audioDirectory;
 }
 
@@ -617,16 +627,105 @@ static NSString *const kItemWhereFroms = @"com.apple.metadata:kMDItemWhereFroms"
 // Get file path with file name in directory
 - (nullable NSString *)filePathWithFileName:(NSString *)fileName atDrectoryPath:(NSString *)directoryPath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtPath:directoryPath];
 
-    for (NSString *file in enumerator) {
-        NSString *name = [file stringByDeletingPathExtension];
-        if ([name isEqualToString:fileName]) {
-            return [directoryPath stringByAppendingPathComponent:file];
+    // Probe the extensions cached audio files can have, instead of enumerating the whole directory on every lookup.
+    // Downloads default to mp3, playback may correct it to wav, and older versions saved m4a.
+    for (NSString *extension in @[ @"mp3", @"wav", @"m4a" ]) {
+        NSString *fileNameWithExtension = [NSString stringWithFormat:@"%@.%@", fileName, extension];
+        NSString *filePath = [directoryPath stringByAppendingPathComponent:fileNameWithExtension];
+        if ([fileManager fileExistsAtPath:filePath]) {
+            return filePath;
         }
     }
 
     return nil;
+}
+
+
+#pragma mark - Audio Cache
+
+/// Schedules an audio cache trim on a background queue, at most once per kAudioCacheTrimInterval.
++ (void)trimAudioCacheIfNeededAtDirectory:(NSString *)directoryPath {
+    static dispatch_queue_t trimQueue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // Background QoS also throttles disk I/O, so trimming does not compete with playback.
+        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_BACKGROUND, 0);
+        trimQueue = dispatch_queue_create("com.izual.Easydict.audio-cache-trim", attributes);
+    });
+
+    dispatch_async(trimQueue, ^{
+        CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
+        if (sLastAudioCacheTrimTime > 0 && now - sLastAudioCacheTrimTime < kAudioCacheTrimInterval) {
+            return;
+        }
+        sLastAudioCacheTrimTime = now;
+
+        [self trimAudioCacheAtDirectory:directoryPath];
+    });
+}
+
+/// If the audio cache exceeds kAudioCacheMaxSize, remove the least recently used files until it fits kAudioCacheTrimTargetSize.
++ (void)trimAudioCacheAtDirectory:(NSString *)directoryPath {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *directoryURL = [NSURL fileURLWithPath:directoryPath isDirectory:YES];
+    NSArray<NSURLResourceKey> *keys = @[
+        NSURLIsRegularFileKey,
+        NSURLTotalFileAllocatedSizeKey,
+        NSURLContentAccessDateKey,
+        NSURLContentModificationDateKey,
+    ];
+    NSArray<NSURL *> *fileURLs = [fileManager contentsOfDirectoryAtURL:directoryURL
+                                            includingPropertiesForKeys:keys
+                                                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                                 error:nil];
+
+    NSMutableArray<NSURL *> *audioFileURLs = [NSMutableArray array];
+    NSMutableDictionary<NSURL *, NSDate *> *lastUsedDates = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSURL *, NSNumber *> *fileSizes = [NSMutableDictionary dictionary];
+    unsigned long long totalSize = 0;
+
+    for (NSURL *fileURL in fileURLs) {
+        NSDictionary<NSURLResourceKey, id> *values = [fileURL resourceValuesForKeys:keys error:nil];
+        if (![values[NSURLIsRegularFileKey] boolValue]) {
+            continue;
+        }
+
+        // Access date may be updated lazily by the file system, so use whichever date is later.
+        NSDate *accessDate = values[NSURLContentAccessDateKey];
+        NSDate *lastUsedDate = values[NSURLContentModificationDateKey] ?: NSDate.distantPast;
+        if (accessDate && [accessDate compare:lastUsedDate] == NSOrderedDescending) {
+            lastUsedDate = accessDate;
+        }
+
+        NSNumber *fileSize = values[NSURLTotalFileAllocatedSizeKey] ?: @0;
+        totalSize += fileSize.unsignedLongLongValue;
+
+        [audioFileURLs addObject:fileURL];
+        lastUsedDates[fileURL] = lastUsedDate;
+        fileSizes[fileURL] = fileSize;
+    }
+
+    if (totalSize <= kAudioCacheMaxSize) {
+        return;
+    }
+
+    [audioFileURLs sortUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        return [lastUsedDates[url1] compare:lastUsedDates[url2]];
+    }];
+
+    NSUInteger removedCount = 0;
+    for (NSURL *fileURL in audioFileURLs) {
+        if (totalSize <= kAudioCacheTrimTargetSize) {
+            break;
+        }
+        if ([fileManager removeItemAtURL:fileURL error:nil]) {
+            totalSize -= fileSizes[fileURL].unsignedLongLongValue;
+            removedCount += 1;
+        }
+    }
+
+    MMLogInfo(@"Trimmed audio cache, removed %lu files, remaining size: %llu bytes", (unsigned long)removedCount, totalSize);
 }
 
 

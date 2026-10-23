@@ -21,13 +21,11 @@ final class SelectionWorkflow {
     var isSelectedTextEditable: Bool = false
 
     var onStartMonitoringKeyboard: (@MainActor () -> ())?
-    var onBrowserURLUpdated: ((String?) -> ())?
 
     func getSelectedTextSnapshot(
         onStartMonitoringKeyboard: (@MainActor () -> ())? = nil,
         completion: @escaping (SelectedTextSnapshot?) -> ()
     ) {
-        recordSelectTextInfo()
         let frontmostApp = contextProvider?.frontmostApplication
         logInfo("getSelectedText in App: \(String(describing: frontmostApp))")
 
@@ -114,12 +112,6 @@ final class SelectionWorkflow {
     }
 
     // MARK: Private
-
-    private func recordSelectTextInfo() {
-        contextProvider?.recordSelectTextInfo { [weak self] urlString in
-            self?.onBrowserURLUpdated?(urlString)
-        }
-    }
 
     private func updateEndPoint() {
         EventMonitor.shared.endPoint = NSEvent.mouseLocation

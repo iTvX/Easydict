@@ -8,8 +8,14 @@
 
 import CoreGraphics
 import CoreText
+import Defaults
 import Foundation
 import Vision
+
+extension Defaults.Keys {
+    /// The OS version whose Vision OCR networks the launch warm-up last compiled successfully.
+    static let visionOCRWarmUpSystemVersion = Key<String?>("AppleOCREngine_visionOCRWarmUpSystemVersion")
+}
 
 // MARK: - AppleOCREngine + WarmUp
 
@@ -25,17 +31,26 @@ extension AppleOCREngine {
     /// can stall for 60–120 seconds. The compiled artifacts are cached per app, so a single
     /// throwaway request at launch moves that cost off the user's first query.
     ///
-    /// This runs at most once per process and returns immediately. With a warm cache the
-    /// underlying request finishes in well under a second, so no cache probing is needed. Any
-    /// failure only means the first real OCR pays the original cost, which is why errors are
-    /// logged instead of propagated.
+    /// This runs at most once per process and returns immediately. The compiled artifacts are
+    /// cached per OS build, so the warm-up is skipped once it has succeeded on the current OS
+    /// version and the cache is still there: even with a warm cache, the request loads the
+    /// detection, recognition and language correction models into the process, adding about
+    /// 8 MB resident and a 77 MB launch peak for users who never use OCR. Any failure only means
+    /// the first real OCR pays the original cost, which is why errors are logged instead of
+    /// propagated.
     static func warmUpVisionOCRIfNeeded() {
+        let systemVersion = ProcessInfo.processInfo.operatingSystemVersionString
+        if Defaults[.visionOCRWarmUpSystemVersion] == systemVersion, !isCompiledNetworkCacheMissing() {
+            return
+        }
         guard markWarmUpStarted() else { return }
 
         Task.detached(priority: .utility) {
             // Delay the request so it does not compete with launch-time work.
             try? await Task.sleep(for: .seconds(warmUpDelayInSeconds))
-            await performWarmUpOCR()
+            if await performWarmUpOCR() {
+                Defaults[.visionOCRWarmUpSystemVersion] = systemVersion
+            }
         }
     }
 
@@ -46,6 +61,46 @@ extension AppleOCREngine {
 
     private static let warmUpLock = NSLock()
     private static var hasStartedWarmUp = false
+
+    /// Name of e5rt's compiled network cache folder inside the app's caches folder.
+    private static let compiledNetworkCacheDirectoryName = "com.apple.e5rt.e5bundlecache"
+
+    /// Whether the compiled network cache for the current OS build is missing, for example after
+    /// a cache cleaner removed it.
+    ///
+    /// On macOS 26 and later, e5rt keeps the cache at
+    /// `<Caches>/<bundle ID>/com.apple.e5rt.e5bundlecache/<OS build>/`. That layout is private, so
+    /// if it ever changes this reports a missing cache and the warm-up simply runs at every launch
+    /// again, as it did before the skip was added.
+    private static func isCompiledNetworkCacheMissing() -> Bool {
+        guard #available(macOS 26.0, *) else { return false }
+
+        guard let osBuildVersion,
+              let bundleID = Bundle.main.bundleIdentifier,
+              let cachesDirectory = FileManager.default.urls(
+                  for: .cachesDirectory, in: .userDomainMask
+              ).first
+        else {
+            return true
+        }
+
+        let cacheDirectory = cachesDirectory
+            .appendingPathComponent(bundleID, isDirectory: true)
+            .appendingPathComponent(compiledNetworkCacheDirectoryName, isDirectory: true)
+            .appendingPathComponent(osBuildVersion, isDirectory: true)
+        let contents = try? FileManager.default.contentsOfDirectory(atPath: cacheDirectory.path)
+        return contents?.isEmpty ?? true
+    }
+
+    /// The OS build version, such as `26A434`, which names e5rt's per-build cache directory.
+    private static var osBuildVersion: String? {
+        var size = 0
+        guard sysctlbyname("kern.osversion", nil, &size, nil, 0) == 0, size > 0 else { return nil }
+
+        var buffer = [CChar](repeating: 0, count: size)
+        guard sysctlbyname("kern.osversion", &buffer, &size, nil, 0) == 0 else { return nil }
+        return buffer.withUnsafeBufferPointer { String(cString: $0.baseAddress!) }
+    }
 
     /// Claims the one-shot warm-up slot, returning `true` only for the first caller.
     private static func markWarmUpStarted() -> Bool {
@@ -58,10 +113,12 @@ extension AppleOCREngine {
     }
 
     /// Runs one throwaway OCR pass so Vision compiles its neural networks ahead of first use.
-    private static func performWarmUpOCR() async {
+    ///
+    /// - Returns: `true` when the request completed without error.
+    private static func performWarmUpOCR() async -> Bool {
         guard let cgImage = makeWarmUpImage() else {
             logError("Vision OCR warm-up skipped: failed to synthesize the warm-up image")
-            return
+            return false
         }
 
         let startTime = CFAbsoluteTimeGetCurrent()
@@ -69,30 +126,34 @@ extension AppleOCREngine {
 
         // Mirror the API selection of `performVisionOCR(on:language:)` so the warm-up compiles
         // the same networks the first real query will need.
+        let succeeded: Bool
         if #available(macOS 26.0, *) {
-            await performModernWarmUpOCR(on: cgImage)
+            succeeded = await performModernWarmUpOCR(on: cgImage)
         } else {
-            await performLegacyWarmUpOCR(on: cgImage)
+            succeeded = await performLegacyWarmUpOCR(on: cgImage)
         }
 
         logInfo("Vision OCR warm-up finished, cost time: \(startTime.elapsedTimeString) seconds")
+        return succeeded
     }
 
     /// Warms up the modern `RecognizeTextRequest` pipeline (macOS 26.0+).
     @available(macOS 26.0, *)
-    private static func performModernWarmUpOCR(on cgImage: CGImage) async {
+    private static func performModernWarmUpOCR(on cgImage: CGImage) async -> Bool {
         var request = RecognizeTextRequest()
         configureWarmUpRequest(&request)
 
         do {
             _ = try await request.perform(on: cgImage)
+            return true
         } catch {
             logError("Vision OCR warm-up failed: \(error.localizedDescription)")
+            return false
         }
     }
 
     /// Warms up the legacy `VNRecognizeTextRequest` pipeline.
-    private static func performLegacyWarmUpOCR(on cgImage: CGImage) async {
+    private static func performLegacyWarmUpOCR(on cgImage: CGImage) async -> Bool {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.recognitionLanguages = AppleLanguageMapper.shared.ocrRecognitionLanguageStrings(
@@ -103,8 +164,10 @@ extension AppleOCREngine {
 
         do {
             try VNImageRequestHandler(cgImage: cgImage).perform([request])
+            return true
         } catch {
             logError("Vision OCR warm-up failed: \(error.localizedDescription)")
+            return false
         }
     }
 

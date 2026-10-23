@@ -20,22 +20,13 @@ class GoogleService: QueryService {
 
     // MARK: - JavaScript Context
 
-    lazy var jsContext: JSContext = {
-        let context = JSContext()
-        if let jsPath = Bundle.main.path(forResource: "google-translate-sign", ofType: "js"),
-           let jsString = try? String(contentsOfFile: jsPath, encoding: .utf8) {
-            context?.evaluateScript(jsString)
-        }
-        return context!
-    }()
+    var signFunction: JSValue {
+        Self.sharedSignFunction
+    }
 
-    lazy var signFunction: JSValue = {
-        jsContext.objectForKeyedSubscript("sign")
-    }()
-
-    lazy var windowObject: JSValue = {
-        jsContext.objectForKeyedSubscript("window")
-    }()
+    var windowObject: JSValue {
+        Self.sharedWindowObject
+    }
 
     // MARK: - QueryService Override
 
@@ -262,6 +253,15 @@ class GoogleService: QueryService {
         return languageCode(for: language) ?? "en"
     }
 
+    /// Stores a new TKK for signing.
+    ///
+    /// The sign script caches the TKK it first reads in its `yr` global, so clear that cache as
+    /// well; otherwise the shared context would keep signing with the first TKK it saw.
+    func updateSignTKK(_ tkk: String) {
+        windowObject.setObject(tkk, forKeyedSubscript: "TKK" as NSCopying & NSObjectProtocol)
+        Self.sharedJSContext.setObject(NSNull(), forKeyedSubscript: "yr" as NSCopying & NSObjectProtocol)
+    }
+
     /// Converts a Google response language code into a TTS language code.
     func ttsLanguageCode(for language: Language, fallbackCode: String? = nil) -> String {
         if language == .english || fallbackCode?.hasPrefix("en") == true {
@@ -305,6 +305,25 @@ class GoogleService: QueryService {
     }
 
     // MARK: Private
+
+    /// Sign script context shared by all instances, created on first use.
+    ///
+    /// Each `JSContext()` creates its own virtual machine, so a per-instance context is costly for
+    /// windows, TTS helpers and HTTP requests that each create a service. JavaScriptCore locks the
+    /// virtual machine for every API call, so concurrent callers are serialized safely. The script's
+    /// `window.TKK` value and its cached copy are shared as well; see `updateSignTKK(_:)`.
+    private static let sharedJSContext: JSContext = {
+        let context = JSContext()
+        if let jsPath = Bundle.main.path(forResource: "google-translate-sign", ofType: "js"),
+           let jsString = try? String(contentsOfFile: jsPath, encoding: .utf8) {
+            context?.evaluateScript(jsString)
+        }
+        return context!
+    }()
+
+    private static let sharedSignFunction: JSValue = sharedJSContext.objectForKeyedSubscript("sign")
+
+    private static let sharedWindowObject: JSValue = sharedJSContext.objectForKeyedSubscript("window")
 
     // Google may choose the `.com` TTS voice based on request region.
     // These hosts keep the selected English accent stable across regions.

@@ -24,6 +24,17 @@ private let kLegacyHTMLDirectories = [
     ".easydict-apple-dictionary-html.noindex",
 ]
 
+/// Matches `<style>` elements, capturing their tags, and stylesheet `<link>` elements.
+private let kStylesheetRegex = try? NSRegularExpression(
+    pattern: #"(<style(?=[\s/>])[^>]*>).*?(</style(?=[\s/>])[^>]*>)"#
+        + #"|<link(?=[\s/>])(?=[^>]*?\brel\s*=\s*["']?[^"'>]*\bstylesheet\b)[^>]*>"#,
+    options: [.caseInsensitive, .dotMatchesLineSeparators]
+)
+private let kStylesheetHrefRegex = try? NSRegularExpression(
+    pattern: #"\shref\s*=\s*(["'])(.*?)\1"#,
+    options: [.caseInsensitive, .dotMatchesLineSeparators]
+)
+
 // MARK: - ResourceEmbeddingState
 
 private struct ResourceEmbeddingState {
@@ -292,7 +303,7 @@ extension AppleDictionary {
             }
 
             if !wordHtmlString.isEmpty {
-                let dictHTML = "\(entryStyle)\n\n\(wordHtmlString)"
+                let dictHTML = "\(entryStyle)\n\n\(emptyingRepeatedStylesheets(in: wordHtmlString))"
                 sections.append(DictionaryHTMLSection(title: dictionary.shortName, html: dictHTML))
             }
         }
@@ -599,6 +610,72 @@ extension AppleDictionary {
             }
         }
         return nil
+    }
+}
+
+// MARK: - Stylesheet Deduplication
+
+extension AppleDictionary {
+    // MARK: Private
+
+    /// Empties stylesheets that repeat the stylesheet right before them in one dictionary document.
+    ///
+    /// Apple dictionaries inline the same large stylesheet in every entry, and all entries of a
+    /// dictionary share one iframe document. A copy that directly follows an identical sheet adds no
+    /// rules, so only its content is dropped. The element itself stays in place, keeping the DOM
+    /// structure and the cascade order of every other stylesheet unchanged.
+    private func emptyingRepeatedStylesheets(in html: String) -> String {
+        guard let regex = kStylesheetRegex else { return html }
+
+        let matches = regex.matches(in: html, range: NSRange(html.startIndex..., in: html))
+        guard matches.count > 1 else { return html }
+
+        var repeatedMatches: [NSTextCheckingResult] = []
+        var previousStylesheet: Substring?
+        for match in matches {
+            guard let range = Range(match.range, in: html) else {
+                previousStylesheet = nil
+                continue
+            }
+            let stylesheet = html[range]
+            // Compare bytes: String equality uses canonical equivalence, but CSS matches code points.
+            if let previousStylesheet, stylesheet.utf8.elementsEqual(previousStylesheet.utf8) {
+                repeatedMatches.append(match)
+            }
+            previousStylesheet = stylesheet
+        }
+
+        var resolvedHTML = html
+        for match in repeatedMatches.reversed() {
+            guard let range = Range(match.range, in: resolvedHTML),
+                  let replacement = emptyStylesheet(for: match, in: resolvedHTML)
+            else { continue }
+            resolvedHTML.replaceSubrange(range, with: replacement)
+        }
+        return resolvedHTML
+    }
+
+    /// Returns the matched `<style>` element without content, or the matched stylesheet `<link>`
+    /// pointing to an empty stylesheet.
+    private func emptyStylesheet(for match: NSTextCheckingResult, in html: String) -> String? {
+        if let openTagRange = Range(match.range(at: 1), in: html),
+           let closeTagRange = Range(match.range(at: 2), in: html) {
+            return "\(html[openTagRange])\(html[closeTagRange])"
+        }
+
+        guard let linkRange = Range(match.range, in: html),
+              let hrefRegex = kStylesheetHrefRegex
+        else { return nil }
+
+        let link = String(html[linkRange])
+        let linkNSRange = NSRange(link.startIndex..., in: link)
+        guard let hrefMatch = hrefRegex.firstMatch(in: link, range: linkNSRange),
+              let hrefRange = Range(hrefMatch.range(at: 2), in: link)
+        else { return nil }
+
+        var emptyLink = link
+        emptyLink.replaceSubrange(hrefRange, with: "data:text/css,")
+        return emptyLink
     }
 }
 
