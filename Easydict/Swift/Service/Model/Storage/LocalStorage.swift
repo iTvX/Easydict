@@ -413,6 +413,12 @@ final class LocalStorage: NSObject {
         ServiceType.builtInAI.rawValue,
     ]
 
+    /// Default services that start collapsed in the fixed window and query only after the user expands them.
+    private let defaultCollapsedFixedServiceTypeIDs: [String] = [
+        ServiceType.deepL.rawValue,
+        ServiceType.builtInAI.rawValue,
+    ]
+
     /// Raw dictionary backing service query statistics.
     private var queryServiceRecordDict: [String: [String: Any]] {
         get {
@@ -441,7 +447,7 @@ final class LocalStorage: NSObject {
                         uuid: uuid,
                         type: baseType,
                         enabled: true,
-                        enabledQuery: queryCount == 0,
+                        enabledQuery: queryCount == 0 && !isCollapsedByDefault(rawType, windowType: windowType),
                         windowType: windowType
                     )
 
@@ -450,6 +456,15 @@ final class LocalStorage: NSObject {
                 }
             }
         }
+    }
+
+    /// Whether a service starts collapsed in the given window on first setup.
+    /// - Parameters:
+    ///   - rawType: Base service type identifier.
+    ///   - windowType: Window the service belongs to.
+    /// - Returns: `true` when the service should not auto-query until expanded.
+    private func isCollapsedByDefault(_ rawType: String, windowType: EZWindowType) -> Bool {
+        windowType == .fixed && defaultCollapsedFixedServiceTypeIDs.contains(rawType)
     }
 
     /// Applies persisted flags to a live service instance.
