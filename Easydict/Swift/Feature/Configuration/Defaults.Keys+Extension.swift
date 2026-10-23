@@ -32,7 +32,7 @@ extension Defaults.Keys {
         default: EZLanguageManager.shared().systemPreferredTwoLanguages[1]
     )
 
-    static let autoShowQueryIcon = Key<Bool>("EZConfiguration_kAutoSelectTextKey", default: true)
+    static let autoShowQueryIcon = Key<Bool>("EZConfiguration_kAutoSelectTextKey", default: false)
     static let autoShowQueryIconExcludedLanguage = Key<Language>(
         "EZConfiguration_kAutoShowQueryIconExcludedLanguageKey",
         default: Defaults[.firstLanguage]
@@ -48,7 +48,7 @@ extension Defaults.Keys {
         default: EnglishPronunciation.us
     )
     static let hideMainWindow = Key<Bool>("EZConfiguration_kHideMainWindowKey", default: true)
-    static let autoQueryOCRText = Key<Bool>("EZConfiguration_kAutoQueryOCTTextKey", default: true)
+    static let autoQueryOCRText = Key<Bool>("EZConfiguration_kAutoQueryOCTTextKey", default: false)
     static let autoQuerySelectedText = Key<Bool>(
         "EZConfiguration_kAutoQuerySelectedTextKey", default: true
     )
@@ -81,19 +81,19 @@ extension Defaults.Keys {
         "EZConfiguration_kPreferYoudaoTTSForEnglishWordKey",
         default: true
     )
-    static let showGoogleQuickLink = Key<Bool>("EZConfiguration_kShowGoogleLinkKey", default: true)
-    static let showEudicQuickLink = Key<Bool>("EZConfiguration_kShowEudicLinkKey", default: true)
+    static let showGoogleQuickLink = Key<Bool>("EZConfiguration_kShowGoogleLinkKey", default: false)
+    static let showEudicQuickLink = Key<Bool>("EZConfiguration_kShowEudicLinkKey", default: false)
     static let showAppleDictionaryQuickLink = Key<Bool>(
-        "EZConfiguration_kShowAppleDictionaryLinkKey", default: true
+        "EZConfiguration_kShowAppleDictionaryLinkKey", default: false
     )
     static let showQuickActionButton = Key<Bool>(
-        "EZConfiguration_kShowSettingQuickLink", default: true
+        "EZConfiguration_kShowSettingQuickLink", default: false
     )
     static let hideMenuBarIcon = Key<Bool>("EZConfiguration_kHideMenuBarIconKey", default: false)
     static let includeBetaUpdates = Key<Bool>("EZConfiguration_kIncludeBetaUpdatesKey", default: false)
     static let fixedWindowPosition = Key<EZShowWindowPosition>(
         "EZConfiguration_kShowFixedWindowPositionKey",
-        default: .right
+        default: .mouse
     )
     static let miniWindowPosition = Key<EZShowWindowPosition>(
         "EZConfiguration_kShowMiniWindowPositionKey",
@@ -120,7 +120,7 @@ extension Defaults.Keys {
     )
     static let selectQueryTextWhenWindowActivate = Key<Bool>(
         "EZConfiguration_kSelectQueryTextWhenWindowActivate",
-        default: false
+        default: true
     )
 
     static let appearanceType = Key<AppearanceType>(
